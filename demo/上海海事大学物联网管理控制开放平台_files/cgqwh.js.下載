@@ -1,0 +1,66 @@
+function deltesens(obj) {
+	$(obj).parent().parent().remove();
+}
+
+function canceladd() {
+	$("#cgq_blockadd").empty();
+}
+
+// 新添加传感器方法
+function saveinfo(previds) {
+	var result = permisJudge("modifyDevice");;
+	if (result) {
+		var sensorname = $("#senname" + previds).val();
+		if (sensorname == null || sensorname == "") {
+			previds = "undefined";
+			sensorname = $("#senname" + previds).val();
+		}
+		if (sensorname.length == 0 && sensorname == "") {
+			warning("操作反馈", "传感器名称不能为空")
+			return;
+		}
+		var sensortype = $("#sensortype" + previds).val().split("/")[1];
+		var sensorid = $("#sensortype" + previds).val().split("/")[0];
+		var dataInterval = $("#dataInterval" + previds).val();
+		var maximum = $("#maximum" + previds).val();
+		var minValue = $("#minValue" + previds).val();
+		var threShold = $("#threShold" + previds).val();
+		var devicetype = 0;
+		if (sensorid == 3 || sensorid == 8 || sensorid == 2) {
+			dataInterval = 0;
+			maximum = 0;
+			minValue = 0;
+			threShold = 0;
+		} else if (dataInterval == "" || maximum == "" || minValue == "" || threShold == "") {
+			warning("操作反馈", "请确认新增传感器参数")
+			return;
+		}
+		var url = requestAddr + "/module/saveAddSensor";
+		var parmData = {
+			"sensorname": sensorname,
+			"sensorId": sensorid,
+			"sensorTypeId": sensortype,
+			"dataInterval": dataInterval,
+			"maximum": maximum,
+			"minValue": minValue,
+			"threShold": threShold,
+			"deviceType": devicetype,
+			"id": moduleId
+		};
+		AjaxPost(url, parmData, function(result) {
+			if (result.code == 200) {
+				success("操作反馈", "增加传感器信息成功")
+				controlquery();
+				$("#cgq_modal").modal("hide");
+				canceladd();
+			} else if (result.code != 208) {
+				warning("操作反馈", "增加传感器信息失败")
+			} else {
+				warning("操作反馈", result.msg)
+			}
+		})
+	} else {
+		notice("操作权限", "您无此操作权限")
+	}
+
+}

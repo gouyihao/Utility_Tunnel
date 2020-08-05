@@ -1,0 +1,407 @@
+var localIp = window.localStorage.getItem("localIp");
+//时间戳用以区分同一浏览器开启多个相同窗口的情况
+function getTime() {
+	var timestamp = new Date().getTime();
+	var temp = timestamp.toString()
+	return temp.substring(temp.length - 4);
+}
+//获取视频弹窗时间
+var popUp = window.localStorage.getItem("popUp");
+if (popUp == null || popUp.length == 0) {
+	getVideoPop()
+}
+
+function getVideoPop() {
+	var url = requestAddr + "/systemconfig/configure"
+	AjaxPost(url, null, function(result) {
+		if (result.info != null) {
+			window.localStorage.setItem('popUp', result.info.videoPopup);
+		}
+	})
+}
+
+
+//将所有websocket的内容整合
+function websocket(page) {
+
+	var websocket = null;
+	//判断当前浏览器是否支持WebSocket
+	var loc = window.location,
+		new_uri;
+	if (loc.protocol === "https:") {
+		new_uri = "wss:";
+	} else {
+		new_uri = "ws:";
+	}
+	var clientId = localIp + getTime()
+	new_uri += "//" + ip + ":" + port1;
+	new_uri += "/websocket/" + clientId + "/" + page;
+	if ('WebSocket' in window) {
+		// websocket = new WebSocket("ws://localhost:8080/websocket");
+		websocket = new WebSocket(new_uri);
+		/* websocket = new WebSocket(new_uri);  */
+	} else {
+		warning("浏览器兼容警告", "该浏览器不兼容Websocket，建议更换浏览器")
+	}
+
+	//连接发生错误的回调方法
+	websocket.onerror = function() {
+		//warning("浏览器兼容警告", "该浏览器不兼容Websocket，建议更换浏览器")
+		setMessageInnerHTML("WebSocket连接发生错误");
+	};
+
+	//连接成功建立的回调方法
+	websocket.onopen = function() {
+		setMessageInnerHTML("WebSocket连接成功，当前客户端：" + clientId + "-" + page);
+	}
+
+	//接收到消息的回调方法
+	websocket.onmessage = function(event) {
+		console.log("page:" + page)
+		var data = event.data
+		var info = data.split("_");
+		console.log("接收到的数据为" + data)
+		//状态查询界面
+		if (page.indexOf("statusquery") >= 0) {
+			//接收的传感器数据
+			if (data.indexOf("sensorstatus") == 0) {
+				var id = info[1];
+				var modelName_sensorName = info[2];
+				var realdata = info[3];
+				//确保数据前没有多余的0
+				if (realdata.charAt(0) == '0' && realdata.charAt(1) != '.') {
+					realdata = realdata.substring(1)
+				}
+				//替换数据
+				if ($("#" + id)) {
+					var info = $("#" + id).html()
+					if (info.indexOf("暂无") >= 0) {
+						info = info.replace("暂无", realdata)
+						$("#" + id).html(info)
+					} else {
+						var r = new RegExp("\\d+(\\\.+\\d+)?", "g");
+						info = info.replace(r, realdata)
+						$("#" + id).html(info)
+					}
+					success("传感器状态反馈", modelName_sensorName + "数据已反馈")
+				}
+			} else if (data.indexOf("devicestatus") == 0) { //接收的控制状态
+				var modelName = info[2];
+				var doportState = info[1].split(";");
+				for (var i = 0; i < doportState.length; i++) {
+					var temp = doportState[i].split("/");
+					if ($("#" + temp[0]).length > 0) {
+						var info = (temp[1] == "1") ? "开" : "关";
+						$("#" + temp[0]).html(info);
+					}
+				}
+				success("设备状态反馈", modelName + "设备状态已反馈")
+			}
+		} else if (page.indexOf("devicecontrol") >= 0) { //远程控制界面
+			if (data.indexOf("devicecontrol") == 0) {
+				var modelName = info[2];
+				var doportState = info[1].split(";");
+				if (modelName == null || modelName.length == 0) {
+					modelName = $("#" + doportState[0].split("/")[0]).parent().parent().parent().parent().prev().html()
+				}
+
+				for (var i = 0; i < doportState.length; i++) {
+					var temp = doportState[i].split("/");
+					if ($("#" + temp[0])) {
+						if (temp[1] == "1") {
+							$($("#" + temp[0]).children()[0]).removeClass("switch-off");
+							$($("#" + temp[0]).children()[0]).addClass("switch-on");
+							//$($("#"+temp[0]).children().children()[1]).html("ON")
+						} else {
+							$($("#" + temp[0]).children()[0]).removeClass("switch-on");
+							$($("#" + temp[0]).children()[0]).addClass("switch-off");
+							//$($("#"+temp[0]).children().children()[1]).html("OFF")
+						}
+
+					}
+				}
+				success("设备状态上报", modelName + "设备状态变化")
+			}
+		} else if (page.indexOf("devreg") >= 0) {
+			if (data.indexOf("module") == 0) { //设备发现
+				var obj = JSON.parse(info[1]);
+				var r = new RegExp("^[0-9]*$", "g");
+				if (obj.status == 0) {
+					getDeviceTypeNameByDeviceTypeId(obj.deviceTypeId)
+					var json = {
+						id: obj.deviceTypeId,
+						deviceName: deviceTypeName,
+						num: 1
+					}
+					var length = VueChoseType.modaltype.length;
+					for (var i = 0; i < length; i++) {
+						if (VueChoseType.modaltype[i].id == obj.deviceTypeId) {
+							VueChoseType.modaltype[i].num = VueChoseType.modaltype[i].num + 1
+							break;
+						}
+					}
+					success("设备入网提示", "deviceTypeName：" + obj.serialNumber + "入网")
+				}
+
+			}
+		} else if (page.indexOf("systemsetting") >= 0) { //视频监控
+			if (data.indexOf("systemstart") >= 0) {
+				if (info[1] == 1) {
+					success("网关运行", "网关" + info[2] + "运行成功")
+				} else {
+					warning("网关运行", "网关" + info[2] + "运行失败")
+				}
+			}
+			if (data.indexOf("systemstop") >= 0) {
+				if (info[1] == 1) {
+					success("网关暂停", "网关" + info[2] + "暂停成功")
+				} else {
+					warning("网关暂停", "网关" + info[2] + "暂停失败")
+				}
+			}
+		} else if (page.indexOf("video") >= 0) { //视频监控
+			if (data.indexOf("warning") >= 0) {
+				var num = parseInt(info[2]);
+				popUp = window.localStorage.getItem("popUp");
+				if (popUp == null || popUp.length == 0)
+					popUp = 10000
+				else {
+					popUp = parseInt(popUp) * 1000
+				}
+				setTimeout('narrow("' + num + '")', parseInt(popUp))
+				enlarge(num);
+			}
+		} else if (page.indexOf("videoset") >= 0) { //监控设置
+			if (data.indexOf("warning") >= 0) {
+				var num = parseInt(info[2]);
+				popUp = window.localStorage.getItem("popUp");
+				if (popUp == null || popUp.length == 0)
+					popUp = 10000
+				else {
+					popUp = parseInt(popUp) * 1000
+				}
+				setTimeout('narrow("' + num + '")', parseInt(popUp))
+				enlarge(num);
+			}
+		} else if (page.indexOf("dtjz") >= 0) {
+
+		} else if (page.indexOf("m2minfo") >= 0) {
+
+		} else if (page.indexOf("realtimeDetails") >= 0) {
+			if (data.indexOf("realdata") >= 0) { //实时数据
+				var data1 = data;
+				var info1 = [];
+				info1 = data1.split(";");
+				//			console.log(info1.length)
+				for (var i = 1; i < info1.length; i++) {
+					info = info1[i].split("_")
+					var dataType = info[0] //1表示温度   0表示湿度  5 表示氧气浓度  6 可燃气 7 表示液位仪浓度  12电流 4光照  13PM2.5  14 Pm10 15 噪声     40相电压  41 相电流  42 总有功  43 总无功
+					//				console.log(dataType)
+					var moduleName = info[1] //设备名
+					var moduleId_sensorId = info[2];
+					moduleId_sensorId = moduleId_sensorId.replace(new RegExp("-", 'g'), "_");
+					var sensorData = info[3] //实时数据
+					var currentDate = info[4] //时间
+					//将日期时间格式修改成只显示时间
+					currentDate = currentDate.substring(currentDate.indexOf(":") - 2, currentDate.length)
+					//				myLine1.update()
+					myLine11.update()
+					myLine22.update()
+					myLine33.update()
+					myLine44.update()
+					myLine55.update()
+					myLine66.update()
+					myLine77.update()
+					myLine88.update()
+					myLine99.update()
+					myLine100.update()
+					myLine101.update()
+					myLine102.update()
+					myLine103.update()
+					myLine104.update()
+					myLine105.update()
+					myLine106.update()
+					myLine107.update()
+					myLine108.update()
+					if (dataType == 1) {
+						addPoint(myLine11, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 0) {
+						addPointHumi(myLine22, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 5) {
+						addPointOxy(myLine33, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 6) {
+						addPointflamable(myLine55, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 7) {
+						addPointFarm(myLine44, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 40) {
+						addVA(myLine66, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 41) {
+						addVA(myLine77, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 42) {
+						addVA(myLine88, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 43) {
+						addVA(myLine99, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 12) {
+						addVA(myLine100, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 4) {
+						addVA(myLine101, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 13) {
+						addVA(myLine102, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 14) {
+						addVA(myLine103, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 15) {
+						addVA(myLine104, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 16) {
+						addVA(myLine105, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 17) {
+						addVA(myLine106, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 9) {
+						addVA(myLine107, currentDate, sensorData, " " + moduleName)
+					} else if (dataType == 10) {
+						addVA(myLine108, currentDate, sensorData, " " + moduleName)
+					}
+					//给界面上赋值
+					if ($("#" + moduleId_sensorId).length > 0) {
+						$("#" + moduleId_sensorId).next().html(sensorData);
+					}
+				}
+			}
+		}
+
+		//公共弹窗
+		if (data.indexOf("alarmmessage") == 0) {
+			warning("数据告警", info[1])
+		} else if (data.indexOf("gatewaydown") == 0) {
+			//断电显示
+			if (info[1] == "0") {
+				warning("网关故障", info[2] + "发生网关故障")
+			} else if (info[1] == "1") {
+				success("网关状态", info[2] + "网关恢复正常")
+			} else if (info[1] == "2") {
+				success("网关状态", info[2] + "网关恢复正常")
+
+			}
+		} else if (data.indexOf("connectionrecover") >= 0) {
+			success("网关状态", "网关:" + info[2] + "进入恢复状态")
+		} else if (data.indexOf("gatewayoffline") >= 0) {
+			warning("网关状态", "网关:" + info[1] + "离线")
+			if (page.indexOf("maintaindev") >= 0) {
+				var datalength = vuee.datas.length;
+				for (var i = 0; i < datalength; i++) {
+					if (vuee.datas[i].id == info[2]) {
+						vuee.datas[i].status = 5
+						break;
+					}
+				}
+			}
+		} else if (data.indexOf("gatewayOnline") >= 0) {
+			success("网关状态", "网关:" + info[1] + "上线")
+			if (page.indexOf("maintaindev") >= 0) {
+				var datalength = vuee.datas.length;
+				for (var i = 0; i < datalength; i++) {
+					if (vuee.datas[i].id == info[2]) {
+						vuee.datas[i].status = 1
+						break;
+					}
+				}
+			}
+		} else if (data.indexOf("changeplatfrom") >= 0) {
+			success("IP修改", "平台IP：" + info[1] + "修改成功")
+		} else if (data.indexOf("changePorts") >= 0) {
+			success("端口修改", "端口命令下发成功，请重启平台")
+		} else if (data.indexOf("newGatewayOnline") >= 0) {
+			success("网关入网", "新网关：" + info[1] + "入网")
+		} else if (data.indexOf("changegateway") >= 0) {
+			success("IP修改", "网关IP由" + info[1] + "修改为" + info[2])
+			if (page.indexOf("systemsetting") >= 0) {
+
+			}
+		} else if (data.indexOf("changeIPFail") >= 0) {
+			error("IP修改", "网关：" + info[1] + "修改IP命令未反馈")
+		} else if (data.indexOf("changePlatformIPFail") >= 0) {
+			error("IP修改", "修改平台IP，网关" + info[1] + "修改未反馈")
+		} else if (data.indexOf("restartGateway") >= 0) {
+			success("网关重启", "网关:" + info[1] + "重启成功")
+			if (page.indexOf("maintaindev") >= 0) {
+				var datalength = vuee.datas.length;
+				for (var i = 0; i < datalength; i++) {
+					if (vuee.datas[i].id == info[2]) {
+						vuee.datas[i].status = 1
+						break;
+					}
+				}
+			}
+		} else if (data.indexOf("modelstate") >= 0) {
+			success("设备状态", "设备:" + info[2] + "当前正常运行")
+		} else if (data.indexOf("restartGatewayFail") >= 0) {
+			warning("网关重启", "网关:" + info[1] + "重启未反馈")
+		} else if (data.indexOf("device") >= 0) { //设备故障
+			if (info[3] != undefined) {
+				if (info[1] == 0) {
+					warning("设备状态", "设备：" + info[3] + "发生故障")
+				} else {
+					success("设备状态", "设备：" + info[3] + "恢复正常")
+				}
+				if (page.indexOf("maintaindev") >= 0) {
+					var datalength = vuee.datas.length;
+					if (info[1] == 0) {
+						for (var i = 0; i < datalength; i++) {
+							if (vuee.datas[i].id == info[2]) {
+								vuee.datas[i].status = 3
+								break;
+							}
+						}
+					} else {
+						for (var i = 0; i < datalength; i++) {
+							if (vuee.datas[i].id == info[2]) {
+								vuee.datas[i].status = 1
+								break;
+							}
+						}
+					}
+				}
+			}
+
+
+		} else if (data.indexOf("changeModuleMAC") >= 0) {
+			if (info[1] == 1) {
+				//更改模块序列号反馈成功，动态更新Vue值
+				var datalength = vuee.datas.length;
+				for (var i = 0; i < datalength; i++) {
+					if (vuee.datas[i].id == id) {
+						vuee.datas[i].serialNumber = newSerialNum
+						break;
+					}
+				}
+				//TODO
+			} else {
+				warning("模块修改", "修改模块序列号未反馈")
+			}
+		}
+
+	}
+
+	//连接关闭的回调方法
+	websocket.onclose = function(event) {
+		setMessageInnerHTML("WebSocket连接关闭");
+		// if(event.code !=4500){
+		// 	reconnect()
+		// }
+	}
+
+	//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+	$(function() {
+		$(window).on('beforeunload', function() {
+			websocket.close();
+		});
+	})
+	//将消息显示在网页上
+	function setMessageInnerHTML(innerHTML) {
+		console.log(innerHTML);
+	}
+	//关闭WebSocket连接
+	function closeWebSocket() {
+		websocket.close();
+	}
+
+}

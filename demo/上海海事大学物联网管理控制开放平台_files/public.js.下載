@@ -1,0 +1,11 @@
+﻿/*请求接口ip*/
+var ip = "192.168.0.100"
+/*请求使用的port*/
+var port = 7002
+/*websocket使用的port*/
+var port1 = 7001
+//var port = 8008
+//请求路径
+var requestAddr = "http://" + ip + ":" + port;
+//NGINX请求路径
+var nginxPath = "http://192.168.0.100:8008"

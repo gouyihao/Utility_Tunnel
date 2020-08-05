@@ -1,0 +1,422 @@
+// new
+//提供位置信息动态获取（多个vue是为了一个界面涉及到多个位置信息绑定）
+var VuePositionType = new Vue({
+	el: "#positiondefined",
+	data: {
+		modaltype: []
+	},
+
+	mounted: function() {
+		//需要执行的方法可以在mounted中进行触发，其获取的数据可以赋到data中后，可以放在前面进行渲染
+		// getDefinePosition()
+	},
+	beforeMount: function() {
+		// this.showdata()
+		// getDefinePosition()
+
+	},
+	updated: function() {
+	},
+	methods: {
+		showdata: function() {},
+		changeMuBule: function(e) {
+			var index = e.target.selectedIndex;
+			var ids = e.target.options[index].id;
+			getMutiPosition(ids, this.modaltype);
+		}
+
+	},
+	watch: function() {
+		//this.datas =  vue.datas;
+		modaltype: this.$forceUpdate();
+	},
+})
+//提供位置信息动态获取（多个vue是为了一个界面涉及到多个位置信息绑定）
+var VuePositionType2 = new Vue({
+	el: "#positiondefined2",
+	data: {
+		modaltype: []
+	},
+
+	mounted: function() {
+		//需要执行的方法可以在mounted中进行触发，其获取的数据可以赋到data中后，可以放在前面进行渲染
+		// getDefinePosition()
+	},
+	beforeMount: function() {
+		// this.showdata()
+		// getDefinePosition()
+
+	},
+	updated: function() {
+	},
+	methods: {
+		showdata: function() {},
+		changeMuBule: function(e) {
+			var index = e.target.selectedIndex;
+			var ids = e.target.options[index].id;
+			getMutiPosition2(ids, this.modaltype);
+		}
+
+	},
+	watch: function() {
+		//this.datas =  vue.datas;
+		modaltype: this.$forceUpdate();
+	},
+})
+//提供位置信息动态获取（多个vue是为了一个界面涉及到多个位置信息绑定）
+var VuePositionType3 = new Vue({
+	el: "#positiondefined3",
+	data: {
+		modaltype: []
+	},
+
+	mounted: function() {
+		//需要执行的方法可以在mounted中进行触发，其获取的数据可以赋到data中后，可以放在前面进行渲染
+		// getDefinePosition()
+	},
+	beforeMount: function() {
+		// this.showdata()
+		// getDefinePosition()
+
+	},
+	updated: function() {
+	},
+	methods: {
+		showdata: function() {},
+		changeMuBule: function(e) {
+			var index = e.target.selectedIndex;
+			var ids = e.target.options[index].id;
+			getMutiPosition2(ids, this.modaltype);
+			$(".control-li").removeClass("ckd")
+			setTimeout('getSmartDeviceByPositionLeft()', 200);
+		}
+
+	},
+	watch: function() {
+		//this.datas =  vue.datas;
+		modaltype: this.$forceUpdate();
+	},
+})
+var VuePosition2 = new Vue({
+	el: "#position2",
+	data: {
+		modaltype: []
+	},
+
+	mounted: function() {
+		//需要执行的方法可以在mounted中进行触发，其获取的数据可以赋到data中后，可以放在前面进行渲染
+		// getDefinePosition()
+		// getSmartDeviceByPositionRight();
+	},
+	beforeMount: function() {
+		// this.showdata()
+		// getDefinePosition()
+
+	},
+	updated: function() {
+		
+	},
+	methods: {
+		showdata: function() {},
+		changeMuBule: function(e) {
+			var index = e.target.selectedIndex;
+			var ids = e.target.options[index].id;
+			getMutiPosition2(ids, this.modaltype);
+			setTimeout("getSmartDeviceByPositionRight()", 200);
+		}
+
+	},
+	watch: function() {
+		//this.datas =  vue.datas;
+		modaltype: this.$forceUpdate();
+	},
+})
+
+//设备维护界面使用
+var VuePositionTemp = new Vue({
+	el: "#positiontemp",
+	data: {
+		modaltype: []
+	},
+
+	mounted: function() {
+		//需要执行的方法可以在mounted中进行触发，其获取的数据可以赋到data中后，可以放在前面进行渲染
+		// getDefinePosition()
+	},
+	beforeMount: function() {
+		// this.showdata()
+		// getDefinePosition()
+
+	},
+	updated: function() {
+	},
+	methods: {
+		showdata: function() {},
+		changeMuBule: function(e) {
+			var index = e.target.selectedIndex;
+			var ids = e.target.options[index].id;
+			//一个界面中含有两处位置查询，id添加_以示区分
+			if (ids.indexOf("_") >= 0) {
+				ids = ids.substring(1)
+			}
+			getMutiPosition(ids, this.modaltype);
+		}
+
+	},
+	watch: function() {
+		//this.datas =  vue.datas;
+		modaltype: this.$forceUpdate();
+	},
+})
+
+//动态获取位置信息
+function getDefinePosition3() {
+	var url = requestAddr + "/system/getDefinePosition";
+	ajaxSynchGet(url, null, function(result) {
+		if (result != null) {
+			for (var i = 0; i < result.length; i++) {
+				VuePositionTemp.modaltype.push(result[i]);
+			}
+		}
+	})
+}
+//查询位置和设备
+var VuePosition3 = new Vue({
+	el: "#position3",
+	data: {
+		modaltype: [],
+		deviceType: []
+	},
+
+	mounted: function() {
+		//需要执行的方法可以在mounted中进行触发，其获取的数据可以赋到data中后，可以放在前面进行渲染
+		// getDefinePosition()
+	},
+	beforeMount: function() {
+		// this.showdata()
+		// getDefinePosition()
+
+	},
+	updated: function() {
+		console.log('updated 更新完成状态===============》');
+	},
+	methods: {
+		showdata: function() {},
+		changeMuBule: function(e) {
+			var index = e.target.selectedIndex;
+			var ids = e.target.options[index].id;
+			//一个界面中含有两处位置查询，id添加_以示区分
+			if (ids.indexOf("_") >= 0) {
+				ids = ids.substring(1)
+			}
+			getMutiPosition2(ids, this.modaltype);
+		}
+
+	},
+	watch: function() {
+		//this.datas =  vue.datas;
+		modaltype: this.$forceUpdate();
+	},
+})
+
+//查询位置和传感器
+var VuePosition4 = new Vue({
+	el: "#position4",
+	data: {
+		modaltype: [],
+		sensorType: []
+	},
+
+	mounted: function() {
+		//需要执行的方法可以在mounted中进行触发，其获取的数据可以赋到data中后，可以放在前面进行渲染
+		// getDefinePosition()
+	},
+	beforeMount: function() {
+		// this.showdata()
+		// getDefinePosition()
+
+	},
+	updated: function() {
+		console.log('updated 更新完成状态===============》');
+	},
+	methods: {
+		showdata: function() {},
+		changeMuBule: function(e) {
+			var index = e.target.selectedIndex;
+			var ids = e.target.options[index].id;
+			//一个界面中含有两处位置查询，id添加_以示区分
+			if (ids.indexOf("_") >= 0) {
+				ids = ids.substring(1)
+			}
+			getMutiPosition2(ids, this.modaltype);
+		},
+		test: function(sensorName){
+			if(sensorName == '人流量传感器'  || sensorName == '人体红外' || sensorName == '烟雾传感器'){
+				return false;
+			}else{
+				return true;
+			}
+			
+		},
+
+	},
+	watch: function() {
+		//this.datas =  vue.datas;
+		modaltype: this.$forceUpdate();
+	},
+})
+
+//动态获取位置信息
+function getDefinePosition(data) {
+	var url = requestAddr + "/system/getDefinePosition";
+	ajaxSynchGet(url, null, function(result) {
+		if (result != null) {
+			for (var i = 0; i < result.length; i++) {
+				data.push(result[i]);
+			}
+			console.log(data)
+		}
+	})
+}
+//动态获取位置信息(除却最后一级菜单)
+function getDefinePosition2(data) {
+	var url = requestAddr + "/system/getDefinePosition";
+	AjaxGet(url, null, function(result) {
+		if (result != null) {
+			var length = result.length;
+			if(length > 1)
+					length = length -1
+			for (var i = 0; i < length; i++) {
+				data.push(result[i]);
+			}
+		}
+	})
+}
+//位置变化查询
+function getMutiPosition2(ids, vuedata) {
+	var url = requestAddr + "/system/getMutiPositionByIds";
+	var parmData = {
+		"ids": ids
+	};
+	AjaxPost(url, parmData, function(result) {
+		
+		if (result != null && result.length > 0) {
+			var Arrleng = vuedata.length;
+			for (var i = ids.split("-")[1]; i < Arrleng; i++) {
+				Vue.delete(vuedata, ids.split("-")[1])
+			}
+			for (var i = 0; i < result.length; i++) {
+				Vue.set(vuedata, result[i].id - 1, result[i])
+				if($("#" + result[i].id)[0]){
+					$($("#" + result[i].id)[0].options[0]).removeAttr("selected")
+					$($("#" + result[i].id)[0].options[0]).attr("selected", "selected")
+				}
+				
+			}
+
+		} else {
+			var Arrleng = vuedata.length;
+			for (var i = ids.split("-")[1]; i < Arrleng; i++) {
+				Vue.delete(vuedata, ids.split("-")[1])
+			}
+
+		}
+
+	})
+}
+//位置变化查询
+function getMutiPosition(ids, vuedata) {
+	var workarea = "";
+	$.each($(".select2"), function(i) {
+		if (i < ids.split("-")[1] + 1) {
+			workarea += $(this).val() + "/";
+		}
+	})
+	if (workarea.length > 0) {
+		workarea = workarea.substring(0, workarea.length - 1);
+	}
+	var url = requestAddr + "/system/getMutiPosition";
+	var parmData = {
+		"workarea": workarea,
+		"ids": ids
+	};
+	AjaxPost(url, parmData, function(result) {
+		if (result != null && result.length > 0) {
+			var Arrleng = vuedata.length;
+			for (var i = ids.split("-")[1]; i < Arrleng; i++) {
+				Vue.delete(vuedata, ids.split("-")[1])
+			}
+			for (var i = 0; i < result.length; i++) {
+				Vue.set(vuedata, result[i].id - 1, result[i])
+				$($("#" + result[i].id)[0].options[0]).removeAttr("selected")
+				$($("#" + result[i].id)[0].options[0]).attr("selected", "selected")
+			}
+
+		} else {
+			var Arrleng = vuedata.length;
+			for (var i = ids.split("-")[1]; i < Arrleng; i++) {
+				Vue.delete(vuedata, ids.split("-")[1])
+			}
+
+		}
+
+	})
+}
+
+
+//setTimeout('zhixing', 3000)
+setTimeout('zhixing()',500)
+function zhixing() {
+	$("html").niceScroll({
+		cursorcolor: "#0b4a84", // 改变滚动条颜色，使用16进制颜色值
+		cursoropacitymax: 0.4, // 当滚动条是显示状态时改变透明度, 值范围 1 到 0
+		cursorborder: "1px solid #fff",
+		cursorborderradius: "5px", // 滚动条圆角（像素）,
+		spacebarenabled: true
+	})
+	$("html").getNiceScroll().resize();
+}
+
+
+
+
+
+function getIp(onNewIP) { //  onNewIp - your listener function for new IPs
+    //compatibility for firefox and chrome
+    var myPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+    var pc = new myPeerConnection({
+        iceServers: []
+    }),
+    noop = function() {},
+    localIPs = {},
+    ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g,
+    key;
+
+    function iterateIP(ip) {
+        if (!localIPs[ip]) onNewIP(ip);
+        localIPs[ip] = true;
+    }
+
+     //create a bogus data channel
+    pc.createDataChannel("");
+
+    // create offer and set local description
+    pc.createOffer().then(function(sdp) {
+        sdp.sdp.split('\n').forEach(function(line) {
+            if (line.indexOf('candidate') < 0) return;
+            line.match(ipRegex).forEach(iterateIP);
+        });
+        
+        pc.setLocalDescription(sdp, noop, noop);
+    }).catch(function(reason) {
+        // An error occurred, so handle the failure to connect
+    });
+
+    //listen for candidate events
+    pc.onicecandidate = function(ice) {
+        if (!ice || !ice.candidate || !ice.candidate.candidate || !ice.candidate.candidate.match(ipRegex)) return;
+        ice.candidate.candidate.match(ipRegex).forEach(iterateIP);
+    };
+}
+
+

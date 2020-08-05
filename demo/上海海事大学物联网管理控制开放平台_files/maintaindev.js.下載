@@ -1,0 +1,1226 @@
+var roleName = window.localStorage.getItem("roleName");
+var localIp = window.localStorage.getItem("localIp");
+var permissionTemp = permisJudge("viewDeviceDetail");
+var permissions = window.localStorage.getItem("permissions");
+if(window.parent.document.getElementById("role") == null){
+	setTimeout("window.location.href = 'login.html'",10)
+}
+var userName = window.parent.document.getElementById("role").innerHTML
+if(permissions == null || userName.length  == 0){
+	notice("权限异常","请重新登陆后操作")
+	setTimeout("window.location.href = 'login.html'",10)
+	// return;
+}
+// if (!permissionTemp)
+// 	window.location.href = "wqfw.html"
+
+var tempSensorList;
+var deviceTypeName;
+//需单独出来，不能放在一个方法中，否则不会重复渲染
+var vuee = new Vue({
+	el: "#group_wh",
+	data: {
+		datas: []
+	},
+	mounted: function() {
+
+		//需要执行的方法可以在mounted中进行触发，其获取的数据可以赋到data中后，可以放在前面进行渲染
+	},
+	beforeMount: function() {
+		this.showData();
+
+	},
+	updated: function() {
+		console.log('====设备数据更新完成===');
+		statueStyle();
+		refreshCheckbox();
+		$(".checked").removeClass("checked")
+		$("html").getNiceScroll().resize();
+		if(roleName !="superadmin"){ //如果不是超级管理员
+			$(".hidden").css("display","none")
+		}else{
+			$(".hidden").css("display","block")
+		}
+	},
+	methods: {
+		showData: function() {
+
+		},
+		modelType: function(deviceTypeId) {
+			//根据设备类型id获取设备名称
+			getDeviceTypeNameByDeviceTypeId(deviceTypeId)
+			return deviceTypeName;
+		},
+		modelStatus: function(status) {
+			if (status == 1) {
+				return "运行中";
+			} else if (status == 3) {
+				return "故障";
+			} else if (status == 5) {
+				return "离线";
+			}
+		},
+		style: function(status) {
+			switch (status) {
+				case 1:
+					return "green";
+					break;
+				case 3:
+					return "red";
+					break;
+				case 5:
+					return "grey";
+					break;
+			}
+		},
+		sensorList: function(sensorList) {
+			if (sensorList != null && sensorList.length > 0) {
+				var sensorInfo = "";
+				for (var i = 0; i < sensorList.length; i++) {
+					var sensor = sensorList[i];
+					if (sensor.deviceType == 0) {
+						sensorInfo += sensor.sensorname + ";";
+					}
+				}
+				if (sensorInfo != null && sensorInfo.length > 0) {
+					sensorInfo = sensorInfo.substring(0, sensorInfo.length - 1);
+					$("#see_modal .modal-body").html(sensorInfo);
+					return sensorInfo;
+				} else {
+					$("#see_modal .modal-body").html("该设备没有接入传感器");
+					return "无"
+				}
+
+			}
+
+		},
+		deviceList: function(deviceList) {
+			if (deviceList != null && deviceList.length > 0) {
+				var sensorInfo = "";
+				for (var i = 0; i < deviceList.length; i++) {
+					var sensor = deviceList[i];
+					if (sensor.deviceType == 1) {
+						sensorInfo += sensor.sensorname + ";";
+					}
+				}
+				if (sensorInfo != null && sensorInfo.length > 0) {
+					sensorInfo = sensorInfo.substring(0, sensorInfo.length - 1);
+					$("#see2_modal .modal-body").html(sensorInfo);
+					return sensorInfo;
+				} else {
+					$("#see2_modal .modal-body").html("该设备没有接入机电设备");
+					return "无"
+				}
+			}
+
+		},
+		updateDevice: function(index, id, modelType, sensorList) {
+			var result = permisJudge("modifyDevice")
+			if(result){
+				$("#change_modal").modal("show")
+				selectPortNum(modelType)
+				moduleId = id;
+				getSensorList(moduleId)
+				console.log(this.datas[index])
+				this.datas[index].sensorList = tempSensorList;
+				sensorList = JSON.stringify(tempSensorList)
+				setTimeout('updateDeviceInfo(' + id + ', ' + modelType + ', ' + sensorList + ')', 200)
+				// updateDeviceInfo(id, modelType, sensorList);
+			}else{
+				notice("操作权限","您无此操作权限");
+			}
+			
+		},
+		updateSensorInfo: function(id, modelType, sensorList) {
+			var result = permisJudge("modifyDevice")
+			if(result){
+				$("#cgq_modal").modal("show")
+				updateSensorInfo(id, modelType, sensorList);
+			}else{
+				notice("操作权限","您无此操作权限");
+			}
+			
+		},
+		updateDeviceNamePosition: function(id, deviceName, position, index) {
+			var result = permisJudge("modifyDevice")
+			if(result){
+				$("#change_modal2").modal("show")
+				$("#modelName2").val(deviceName);
+				if (position != null) {
+					var positionTemp = position.split("/")
+					$.each($("#positiontemp select"), function(i) {
+						console.log($(this))
+						$(this).val(positionTemp[i])
+					})
+				}
+				moduleId = id;
+				indexTemp = index;
+			}else{
+				notice("操作权限","您无此操作权限");
+			}
+			
+
+		},
+		deleteModule: function(id, index) {
+			var result = permisJudge("deleteDevice")
+			if(result){
+				$("#remove_modal").modal("show")
+				moduleId = id;
+				indexTemp = index;
+			}else{
+				notice("操作权限","您无此操作权限");
+			}
+			
+		},
+		showOpera: function(){
+			var result = permisJudge("queryDeviceState")
+			return result;
+		},
+		showOpera2: function(){
+			var result = permisJudge("restartGateway")
+			return result;
+		},
+		showOpera3:function(){
+			var result=permisJudge("replaceDevice")
+			return result;
+		},
+		deviceStatus: function(id) {
+			deviceStatusQuery(id)
+		},
+		restart:function(gatewayAddr, index){
+			console.log(gatewayAddr)
+			restartGateway(gatewayAddr, index)
+		},
+		moditifyMAC:function(id,serialNum){
+			$("#oldSerialnum").val(serialNum)
+			$("#oldSerialnum").attr("label2", id)
+		}
+		/*        seri:function(gate, seri){
+		          return gate+"-"+seri;
+		        }*/
+	},
+	watch: function() {
+		//this.datas =  vue.datas;
+		datas: this.$forceUpdate();
+	},
+});
+
+
+//查询设备的状态，检测设备当前运行状态是否正常
+function deviceStatusQuery(id) {
+	var url = requestAddr + "/module/queryDeviceState/"+id;
+	AjaxGet(url, null, function(data) {
+		if (data.code == 200) { //查询并得到反馈
+			// success("设备状态查询", "反馈数据："+data.info)
+		}else{
+			error("设备状态查询", data.msg)
+		}
+	})
+}
+
+//根据设备类型Id获取设备类型名称
+function getDeviceTypeNameByDeviceTypeId(deviceTypeId) {
+	var url = requestAddr + "/module/getDeviceInfoByDeviceTypeId"
+	var parmData = {
+		"deviceTypeId": deviceTypeId
+	}
+	ajaxSynchGet(url, parmData, function(result) {
+		deviceTypeName = result.deviceTypeName;
+	})
+
+}
+//TODO 界面样式没有写
+$("#moditifyMACAddress").click(function(){
+	var id=$("#oldSerialnum").attr("label2")
+	var originalSerialnum=$("#oldSerialnum").val();
+	var newSerialnum=$("#newSerialnum").val();
+	console.log(id+" "+originalSerialnum+" "+newSerialnum)
+	moditifyModuleMacAddress(id,originalSerialnum,newSerialnum)
+})
+function moditifyModuleMacAddress(moduleId,originalSerialnum,newSerialnum){
+	if(originalSerialnum==newSerialnum){
+		warning("修改模块", "新序列号与旧序列号一致")
+		return;
+	}
+	if(newSerialnum.split(".").length!=4){
+		warning("修改模块", "新序列号不合法")
+		return;
+	}
+	var url=requestAddr+"/module/moditifyModuleMacAddress"
+	var parmData={
+		'moduleId':moduleId,
+		'originalSerialnum':originalSerialnum,
+		'newSerialnum':newSerialnum
+	}
+	AjaxPost(url,parmData,function(result){
+		if(result.code==200){
+			notice("修改模块","命令已下发成功")
+		}else{
+			warning("修改模块", result.msg)
+		}
+	})
+}
+// new
+var VueZcpart = new Vue({
+	el: "#example2",
+	data: {
+		clistinfo: [],
+		devicelist: []
+	},
+	created: function() { //如果没有这句代码，select中初始化会是空白的，默认选中就无法实现
+		getSmartDevice(this.devicelist)
+	},
+	mounted: function() {
+
+		$("#example2").niceScroll({
+			cursorcolor: "#addce500",
+			cursoropacitymax: 0,
+			cursorborder: "0px solid rgb(186, 186, 186)",
+			cursorborderradius: "5px",
+			spacebarenabled: true
+		})
+
+
+	},
+
+	methods: {
+		changetypenub: function() {
+			findDimensions()
+		},
+		info: function(portName) {
+			if (portName == "DO") {
+				return "外接机电设备名称"
+			} else {
+				return "监听设备状态名称"
+			}
+		}
+	},
+	updated: function() {
+		$("html").getNiceScroll().resize();
+		// $("#example2").getNiceScroll().resize();
+	},
+	watch: {
+		clistinfo: function() {
+			this.$forceUpdate();
+		}
+	}
+})
+
+/**
+ * 根据deviceId,获取设备列表
+ * @param {Object} deviceId
+ */
+function getSensorList(deviceId) {
+	var url = requestAddr + "/module/getSensorListByDeviceId"
+	var parmData = {
+		"deviceId": deviceId
+	}
+	ajaxSynchGet(url, parmData, function(result) {
+		tempSensorList = result
+	})
+
+}
+//查询接口信息
+function selectPortNum(deviceTypeId) {
+	var url = requestAddr + "/module/getPortNumByDeviceTypeId"
+	var parmData = {
+		"deviceTypeId": deviceTypeId
+	}
+	AjaxPost(url, parmData, function(result) {
+		VueZcpart.clistinfo = result
+	})
+}
+//设备信息查询
+function controlquery() {
+	var result = permisJudge("viewDeviceDetail");
+	if (result) {
+		var position = "";
+		//根据选择的位置以及传感器类型
+		$.each($("#positiondefined2 select"), function(i) {
+			position += $(this).val() + "/";
+		})
+		if (position.length == 0) {
+			$.each($("#positiondefined2 select"), function(i) {
+				position += $(this).val() + "/";
+			})
+			if (position.length == 0) {
+				notice("位置选择错误", "请选择位置信息后查询")
+				return;
+			}
+		}
+		position = position.substring(0, position.length - 1)
+		getModuleInfo(position)
+		getModuleCountTypeInfo(position);
+	} else {
+		// notice("翻页查询", "已经到达首页")
+		window.location.href = 'wqfw.html'
+	}
+
+}
+
+//刷新按钮
+function fresh() {
+	var position = "";
+	//根据选择的位置以及传感器类型
+	$.each($("#example div"), function(i) {
+		if (i >= 0 && i < 3) {
+			position += $(this).children().val() + "/";
+		}
+	})
+	console.log(position)
+	if (position.indexOf("null") >= 0) {
+		notice("位置选择错误", "请选择位置信息后查询")
+		return;
+	}
+	position = position.substring(0, position.length - 1)
+	getModuleInfo(position)
+}
+//传感器数量总页码
+var pageCount = 0
+var pageSize = 50;
+//首页
+function firstPage() {
+	if ($("#NetSelect").css("display") == "none") {
+		if ($("#pageno").val() == 1) {
+			notice("翻页查询", "已到首页")
+		} else {
+			$("#pageno").val(1)
+			controlquery();
+		}
+
+	} else {
+		if ($("#pageno").val() > 1) {
+			$("#pageno").val(1)
+			var subnet = $("#gateways").val();
+			getModuleInfo2(subnet)
+		} else {
+			notice("翻页查询", "已到首页")
+		}
+	}
+
+}
+//上一页
+function prePage() {
+	if ($("#NetSelect").css("display") == "none") {
+		var firstPage = $("#pageno").val();
+		if (firstPage == 1) {
+			$("#pageno").val(1);
+			notice("翻页查询", "已经到达首页")
+		} else {
+			$("#pageno").val(firstPage - 1)
+			controlquery();
+		}
+	} else {
+		var firstPage = $("#pageno").val();
+		var subnet = $("#gateways").val();
+		if (firstPage == 1) {
+			$("#pageno").val(1);
+			notice("翻页查询", "已经到达首页")
+		} else {
+			$("#pageno").val(firstPage - 1)
+			getModuleInfo2(subnet)
+		}
+	}
+
+}
+//下一页
+function nextPage() {
+	if ($("#NetSelect").css("display") == "none") {
+		var fir = parseInt($("#pageno").val())
+		var firstPage = fir + 1;
+		pageCount = parseInt(pageCount);
+		if (firstPage > pageCount) {
+			$("#pageno").val(pageCount);
+			notice("翻页查询", "已到达最大页码")
+		} else {
+			$("#pageno").val(firstPage);
+			controlquery();
+		}
+	} else {
+		var fir = parseInt($("#pageno").val())
+		var subnet = $("#gateways").val();
+		var firstPage = fir + 1;
+		pageCount = parseInt(pageCount);
+		if (firstPage > pageCount) {
+			$("#pageno").val(pageCount);
+			notice("翻页查询", "已到达最大页码")
+		} else {
+			$("#pageno").val(firstPage);
+			getModuleInfo2(subnet)
+		}
+	}
+
+}
+
+//末页
+function lastPage() {
+	if ($("#NetSelect").css("display") == "none") {
+		if ($("#pageno").val() < pageCount) {
+			$("#pageno").val(pageCount);
+			controlquery();
+		} else {
+			notice("翻页查询", "已到末页")
+		}
+	} else {
+		var subnet = $("#gateways").val();
+		if ($("#pageno").val() < pageCount) {
+			$("#pageno").val(pageCount);
+			getModuleInfo2(subnet)
+		} else {
+			notice("翻页查询", "已到末页")
+		}
+	}
+}
+//跳转
+function aimPage() {
+	if ($("#NetSelect").css("display") == "none") {
+		if ($("#divFood").html() >= $("#pageno").val()) {
+			controlquery();
+		} else {
+			notice("翻页查询", "输入页码错误！")
+		}
+	} else {
+		if ($("#divFood").html() >= $("#pageno").val()) {
+			var subnet = $("#gateways").val();
+			getModuleInfo2(subnet)
+		} else {
+			notice("翻页查询", "输入页码错误！")
+		}
+
+	}
+}
+//获取设备数据(位置和设备名称)
+function getModuleInfo(position) {
+	var url = requestAddr + "/module/selectModuleByPosition"
+	var parmData = {
+		'firstPage': $("#pageno").val(),
+		'pageSize': pageSize,
+		'position': position
+	};
+	AjaxPost(url, parmData, function(result) {
+		if (result.code != 200) {
+			error("查询反馈", result.msg)
+		} else {
+			if (result.data != null) {
+				vuee.datas.splice(0, vuee.datas.length);
+				var data = result.data;
+				pageCount = result.msg;
+				$("#divFood").text(pageCount)
+				for (var i = 0; i < data.length; i++) {
+					vuee.datas.push(data[i]);
+				}
+				if (data.length > 0) {
+					$("#devicelist").show()
+				} else {
+					$("#main").parent().parent().hide()
+					error("数据为空", "不存在此条件下的信息，请重新选择查询条件")
+				}
+			} else {
+				vuee.datas.splice(0, vuee.datas.length)
+				error("查询反馈", "当前位置暂无设备信息")
+			}
+		}
+
+	})
+}
+$("#multiDelete").click(function() {
+	delteModuleById();
+})
+$("#multiDelte").click(function() {
+	delteModuleById();
+})
+
+function delteModuleById() {
+	var ids = "";
+	if ($("#tb_wh .icheckbox_minimal").hasClass("checked")) {
+		$("#tb_wh .checked").each(function() {
+			var tablerow = $(this).parent().parent("tr");
+			var tablecol = tablerow.find("td");
+			var text0 = tablecol.text();
+			ids += text0.substring(text0.lastIndexOf(";") + 1, text0.length);
+			ids += ":";
+			console.log(ids)
+		})
+	}
+	if (ids.length > 0) {
+		moduleId = ids;
+		$("#remove_modal").modal("show");
+	} else {
+		notice("多选操作", "请勾选至少一个复选框")
+	}
+}
+$("#delete").click(function() {
+	var result = permisJudge("deleteDevice");
+	if (!result) {
+		notice("操作权限", "您的权限不足")
+		return;
+	} else {
+		var url = requestAddr + "/module/deleteModuleById";
+		var ids = moduleId;
+		var parmData = {
+			"id": ids
+		};
+		AjaxPost(url, parmData, function(result) {
+			if (result.code == 200) {
+				success("操作反馈", "删除设备成功")
+				vuee.datas.splice(indexTemp, 1)
+			} else if (result.code == 208) {
+				error("操作反馈", "删除设备失败")
+			} else if (result.code == 208) {
+				error("操作反馈", result.msg)
+			}
+		})
+
+	}
+
+})
+
+var moduleId = 0;
+var indexTemp = 0; //记录删除数据的某个位置
+//修改设备所连的设备
+function updateDeviceInfo(id, modelType, sensorList) {
+		if (modelType == 0 || modelType == 1 || modelType == 2 || modelType == 3 || modelType == 4) {
+			//设备名称
+			$("#modelName2").val($($("#" + id).children()[3]).html())
+			$("#modelName2").attr("label2", id + "-" + modelType)
+		}
+		if (modelType == 5) {
+			//设备名称
+			$("#modelName2").val($($("#" + id).children()[3]).html())
+			$("#modelName2").attr("label2", id + "-" + modelType)
+			//首先将所有位置的数据清空
+			$("[id^='nameDI']").each(function(i) {
+				$(this).val("")
+			})
+			$("[id^='clistDO']").each(function(i) {
+				var port = $(this).attr("label");
+				if ($("#clist" + port + " option[value='删除此设备']").length == 1)
+					$("#clist" + port + " option[value='删除此设备']").remove();
+				if ($("#clist" + port + " option[value='所接设备']").length == 0)
+					$("#clist" + port).prepend("<option value='所接设备'>所接设备</option>");
+				$(this).val("所接设备")	
+			})
+			$("[id^='nameDO']").each(function(i) {
+				$(this).val("")
+			})
+			if (sensorList != null && sensorList.length > 0) {
+				for (var i = 0; i < sensorList.length; i++) {
+					var sensor = sensorList[i];
+					if (sensor.deviceType == 1) {
+						var sensorId = sensor.sensorId
+						if (sensor.port.indexOf("DO") >= 0) {
+							$("#clist" + sensor.port).val(sensorId + "/" + sensor.sensorTypeId)
+							$("#name" + sensor.port).val(sensor.sensorname)
+							$("#clist" + sensor.port + " option[value='所接设备']").remove();
+							if ($("#clist" + sensor.port + " option[value='删除此设备']").length == 0)
+								$("#clist" + sensor.port).prepend("<option value='删除此设备'>删除此设备</option>");
+						} else {
+							$("#name" + sensor.port).val(sensor.sensorname)
+						}
+					}
+				}
+			} else {
+				$("[id^='clist']").each(function(i) {
+					var port = $(this).attr("label");
+					var tempportinfo = $(this).val();
+					$("#name" + port).val("")
+					if ($("#clist" + port + " option[value='删除此设备']").length > 0) {
+						$("#clist" + port + " option[value='删除此设备']").remove();
+						$("#clist" + port).prepend("<option value='所接设备' selected='selected'>所接设备</option>");
+					}
+				})
+			}
+		}
+	setTimeout(function() {
+
+		$("html").getNiceScroll().resize();
+		$("#exmple2").getNiceScroll().resize();
+	}, 1000)
+}
+$("#saveModuleinfo").click(function() {
+	var positions = "";
+	var workarea = "";
+	var id = moduleId
+	var modelname = $("#modelName2").val();
+	$.each($("#positiontemp select"), function(i) {
+		if (i == 0) {
+			workarea = $(this).val()
+		}
+		positions += $(this).val() + "/";
+	})
+	if (positions.length == 0) {
+		notice("位置选择错误", "请选择位置信息后查询")
+		return;
+	}
+	positions = positions.substring(0, positions.length - 1)
+	var url = requestAddr + "/module/updateModuleInfoById";
+	var parmData = {
+		"position": positions,
+		"id": id,
+		"workarea": workarea,
+		"deviceName": modelname
+	};
+	AjaxPost(url, parmData, function(result) {
+		if (result.code == 200) {
+			success("操作反馈", "设备信息更新成功")
+			vuee.datas[indexTemp].deviceName = modelname;
+			vuee.datas[indexTemp].position = positions;
+			$("#change_modal2").modal("hide")
+		} else if (result.code == 208) {
+			error("操作反馈", "设备信息更新失败")
+		} else {
+			error("操作反馈", result.msg)
+		}
+	})
+})
+//提交修改设备接口信息
+function updateModuleInfo() {
+	var result = permisJudge("modifyDevice");
+	if (result) {
+		var id = moduleId;
+		//portinfo
+
+		var portinfo = "";
+		//DO口
+		$("[id^='clist']").each(function(i) {
+			var port = $(this).attr("label");
+			var tempportinfo = $(this).val();
+			var sensorName = $("#name" + port).val()
+			if (port.indexOf("DO") >= 0) {
+				if (tempportinfo != "所接设备") {
+					if (sensorName != null && sensorName != "" && sensorName.length > 0) {
+						portinfo += tempportinfo + "/1" + "_" + sensorName + "_" + port + ";";
+					} else {
+						portinfo += tempportinfo + "/1" + "_" + $("#clist" + port + " option:selected").text() + "_" + port + ";";
+					}
+				}
+			}
+		})
+		//DI口
+		$("[id^='nameDI']").each(function(i) {
+			var port = $(this).attr("id");
+			var portName = port.substring(4)
+			var sensorId = i + 19
+			var sensorTypeId = 19
+			var sensorName = $(this).val();
+			if (sensorName != null && sensorName != "" && sensorName.length > 0) {
+				portinfo += sensorId + "/" + sensorTypeId + "/1" + "_" + sensorName + "_" + portName + ";";
+			}
+		})
+		if (portinfo != null && portinfo.length > 0) {
+			portinfo.substring(0, portinfo.length - 1);
+		}
+		updateDevices(id, portinfo)
+	} else {
+		notice("操作权限", "您的权限不足")
+	}
+
+}
+//修改设备接口所连控制器信息
+function updateDevices(id, portinfo) {
+	var url = requestAddr + "/module/saveDevicePortInfo";
+	var parmData = {
+		"id": id,
+		"portinfo": portinfo
+	};
+	AjaxPost(url, parmData, function(result) {
+		if (result.code == 200) {
+			success("操作反馈", "接口信息修改成功")
+			$("#change_modal2").modal("hide")
+			fresh()
+		} else if (result.code == 208) {
+			error("操作反馈", "接口信息修改失败")
+		} else {
+			error("操作反馈", result.msg)
+		}
+	})
+}
+// 修改传感器
+var vue3 = new Vue({
+	el: "#cgq_list",
+	data: {
+		sensordata: [],
+		selected: {},
+		sensorList: [],
+		unit: ""
+	},
+	beforeMount: function() {
+		this.showData();
+	},
+	updated: function() {
+		console.log('updated 更新完成状态===============》');
+		//  refreshCheckbox();
+	},
+	methods: {
+		showData: function() {
+
+		},
+		del: function(id) {
+			delSensor(id);
+		},
+		add: function() {
+			this.selected.id = "add"
+		},
+		showdetailSensor: function(e) {
+			// console.log($("#ssss").attr("id"))
+			var that = this;
+			var sensordata = this.sensordata;
+			var val = e.target.value;
+			console.log(val);
+			var sensorId = "";
+			var sensorType = "";
+			var sensorlistId = "";
+
+			if (val == "添加") {
+				vue3.selected = {};
+				$($($($("#threShold" + add).parent()).prev()).children()).empty();
+				$($($($("#maximum" + add).parent()).prev()).children()).html("")
+				$($($($("#minValue" + add).parent()).prev()).children()).html("")
+			}
+			for (i = 0; i < sensordata.length; i++) {
+				if (val == sensordata[i].sensorname) {
+					sensorId = sensordata[i].sensorId;
+					sensorType = sensordata[i].sensorTypeId;
+					sensorlistId = sensordata[i].id;
+					this.selected = sensordata[i];
+					break;
+				} else {
+
+				}
+			}
+			var url = requestAddr + "/sensor/getSensorUnitById";
+			var parmData = {
+				"sensorId": sensorId,
+				"sensorTypeId": sensorType
+			};
+			AjaxPost(url, parmData, function(result) {
+				$($($($("#threShold" + sensorlistId).parent()).prev()).children()).html("(单位:" + result + ")")
+				$($($($("#maximum" + sensorlistId).parent()).prev()).children()).html("(单位:" + result + ")")
+				$($($($("#minValue" + sensorlistId).parent()).prev()).children()).html("(单位:" + result + ")")
+				$("#sensortype1").val(sensorId + "/" + sensorType)
+			})
+		},
+		change3: function(id) {
+			updateSensors(id);
+		},
+		selectedIs: function(sensorId, sensorTypeId, temp) {
+			if ((sensorId + "/" + sensorTypeId) == temp) {
+				return "selected";
+			}
+		},
+		show: function(id) {
+
+			var sensorId = $("#sensortype" + id).val().split("/")[0]
+			var sensorType = $("#sensortype" + id).val().split("/")[1]
+			console.log(sensorType)
+			if (sensorId == 3 || sensorId == 8 || sensorId == 2) {
+				$("#dataInterval" + id).attr("readonly", "readonly")
+				$("#threShold" + id).attr("readonly", "readonly")
+				$("#maximum" + id).attr("readonly", "readonly")
+				$("#minValue" + id).attr("readonly", "readonly")
+			} else {
+				if ($("#dataInterval" + id).prop("readonly")) {
+					$("#dataInterval" + id).removeAttr("readonly")
+					$("#threShold" + id).removeAttr("readonly")
+					$("#maximum" + id).removeAttr("readonly")
+					$("#minValue" + id).removeAttr("readonly")
+				}
+			}
+			var url = requestAddr + "/sensor/getSensorUnitById";
+			var parmData = {
+				"sensorId": sensorId,
+				"sensorTypeId": sensorType
+			};
+			AjaxPost(url, parmData, function(result) {
+				$($($($("#threShold" + id).parent()).prev()).children()).html("(单位:" + result + ")")
+				$($($($("#maximum" + id).parent()).prev()).children()).html("(单位:" + result + ")")
+				$($($($("#minValue" + id).parent()).prev()).children()).html("(单位:" + result + ")")
+			})
+		}
+	}
+
+})
+var vue2 = new Vue({
+	el: "#cgq_block",
+	data: {
+		sensordata: []
+	},
+	mounted: function() {
+
+		//需要执行的方法可以在mounted中进行触发，其获取的数据可以赋到data中后，可以放在前面进行渲染
+	},
+	beforeMount: function() {
+		this.showData();
+
+	},
+	updated: function() {
+		console.log('updated 更新完成状态===============》');
+
+		//  refreshCheckbox();
+	},
+	methods: {
+		showData: function() {
+
+		},
+		change1: function(id) {
+			console.log(id)
+			if ($("#sensor" + id).css("display") == "block") {
+				$("#sensor" + id).css("display", "none");
+
+			} else {
+				$("#sensor" + id).css("display", "block");
+			}
+		},
+		// 		change2: function(id) {
+		// 			$("#sensor"+id).css("display", "none");
+		// 			$("#btn2"+id).css("display", "none");
+		// 			$("#btn2"+id).css("display", "none");
+		// 		},
+		change3: function(id) {
+			updateSensors(id);
+			$("#sensor" + id).css("display", "none");
+			// $("#btn2"+id).css("display", "none");
+
+		},
+		selectedIs: function(sensorId, sensorTypeId, temp) {
+			if ((sensorId + "/" + sensorTypeId) == temp) {
+				return "selected";
+			}
+		},
+		/*saveParam:function(sensor_id, modelId, sensorId, sensorType){
+		  console.log("sssssssss")
+		    saveParamOperation(sensor_id, modelId, sensorId, sensorType)
+		},*/
+		del: function(id) {
+			delSensor(id);
+		},
+	}
+
+})
+// 删除
+function delSensor(id) {
+	var result = permisJudge("deleteDevice");;
+	if (result) {
+		var url = requestAddr + "/module/delSensor";
+		var parmData = {
+			"id": id,
+		};
+		AjaxPost(url, parmData, function(result) {
+			if (result.code == 200) {
+				success("操作反馈", "删除传感器成功")
+				$("#sensorname" + id).remove();
+				vue3.selected = {};
+			} else {
+				error("操作反馈", result.msg)
+			}
+		})
+	} else {
+		notice("操作权限", "您无此操作权限")
+	}
+
+}
+
+function updateSensorInfo(id, modelType, sensorList) {
+	moduleId = id;
+	$("#save").attr("value", id)
+	if (sensorList != null && sensorList.length > 0) {
+		var newSensorList = []
+		for (var i = 0; i < sensorList.length; i++) {
+			//人流量、人体、烟感不支持参数修改
+			if (sensorList[i].deviceType == 0 && sensorList[i].sensorId != 2 && sensorList[i].sensorId != 3 && sensorList[i].sensorId !=
+				8) {
+				console.log(sensorList[i])
+				newSensorList.push(sensorList[i])
+			}
+		}
+
+		console.log(newSensorList.length)
+		// vue2.sensordata = newSensorList
+		vue3.sensordata = newSensorList
+		vue3.selected = {};
+		vue3.selected.id = "add";
+		console.log(vue3.sensordata.length)
+	}
+}
+
+function updateSensors(id) {
+	console.log(id)
+	if (!isNegIntNum(id)) {
+		saveinfo("add")
+	} else {
+		var result = permisJudge("modifyDevice");
+		if (result) {
+			var sensorName = $("#senname" + id).val();
+			var sensorType = $("#sensortype" + id).val().split("/")[1];
+			var sensorId = $("#sensortype" + id).val().split("/")[0];
+			var dataInterval = $("#dataInterval" + id).val();
+			var maximum = $("#maximum" + id).val();
+			var minnum = $("#minValue" + id).val();
+			var threShold = $("#threShold" + id).val();
+			console.log(sensorName + " " + sensorId + " " + sensorType + " " + dataInterval + " " + maximum + " " + minnum + " " +
+				threShold)
+			var url = requestAddr + "/module/updateSenInfo";
+			var parmData = {
+				"id": id,
+				"sensorname": sensorName,
+				"sensorTypeId": sensorType,
+				"sensorId": sensorId,
+				"dataInterval": dataInterval,
+				"maximum": maximum,
+				"minValue": minnum,
+				"threShold": threShold
+			};
+			AjaxGet(url, parmData, function(result) {
+				if (result.code == 200) {
+					success("操作反馈", "修改传感器信息成功")
+					fresh()
+					$("#cgq_modal").modal("hide")
+				} else if (result.code == 208) {
+					error("操作反馈", result.info.errorinfo)
+				} else {
+					error("操作反馈", result.msg)
+				}
+			})
+		} else {
+			notice("操作权限", "您无此操作权限")
+		}
+	}
+
+
+}
+
+
+// 网络信息搬迁
+var vm = new Vue({
+	el: "#gateways",
+	data: {
+		gatewayInfo: []
+	}
+
+})
+var vnet0 = new Vue({
+	el: "#type_tj",
+	data: {
+		datas: [{
+			modelType: "0",
+			modelTypeName: "SDN网关控制器",
+			count: 0
+		}, {
+			modelType: "2",
+			modelTypeName: "物联网协调器Ⅰ型",
+			count: 0
+		}, {
+			modelType: "3",
+			modelTypeName: "物联网协调器Ⅱ型",
+			count: 0
+		}, {
+			modelType: "4",
+			modelTypeName: "物联网终端耦合器",
+			count: 0
+		}, {
+			modelType: "5",
+			modelTypeName: "智能网络控制器",
+			count: 0
+		}]
+	}
+})
+
+function getGatmodelCount(subnet) {
+	var url = requestAddr + "/module/getModuleCountByType";
+	var parmData = {
+		'gateWay': subnet
+	};
+	AjaxPost(url, parmData, function(result) {
+		if (result.info != null) {
+			vnet0.datas[0].count = 0
+			vnet0.datas[1].count = 0
+			vnet0.datas[2].count = 0
+			vnet0.datas[3].count = 0
+			vnet0.datas[4].count = 0
+			var strs = result.info.split("/");
+			for (var i = 0; i < strs.length; i++) {
+				var strsplit = strs[i].split("_");
+				if (strsplit[1] == 0) {
+					vnet0.datas[0].count = strsplit[0];
+				} else if (strsplit[1] == 1) {
+					vnet0.datas[1].count = strsplit[0];
+				} else if (strsplit[1] == 3) {
+					vnet0.datas[2].count = strsplit[0];
+				} else if (strsplit[1] == 4) {
+					vnet0.datas[3].count = strsplit[0];
+				} else if (strsplit[1] == 5) {
+					vnet0.datas[4].count = strsplit[0];
+				}
+			}
+		} else {
+			warning("操作反馈", "获取设备种类数量错误")
+		}
+	})
+}
+
+function getModuleCountTypeInfo(position) {
+	var url = requestAddr + "/module/getModuleCountTypeByPosition";
+	var parmData = {
+		"position": position
+	};
+	AjaxPost(url, parmData, function(result) {
+		if (result != null) {
+			vnet0.datas[0].count = 0
+			vnet0.datas[1].count = 0
+			vnet0.datas[2].count = 0
+			vnet0.datas[3].count = 0
+			vnet0.datas[4].count = 0
+			var strs = result.info.split("/");
+			for (var i = 0; i < strs.length; i++) {
+				var strsplit = strs[i].split("_");
+				if (strsplit[1] == 0) {
+					vnet0.datas[0].count = strsplit[0];
+				} else if (strsplit[1] == 1) {
+					vnet0.datas[1].count = strsplit[0];
+				} else if (strsplit[1] == 3) {
+					vnet0.datas[2].count = strsplit[0];
+				} else if (strsplit[1] == 4) {
+					vnet0.datas[3].count = strsplit[0];
+				} else if (strsplit[1] == 5) {
+					vnet0.datas[4].count = strsplit[0];
+				}
+			}
+		} else {
+			warning("操作反馈", "获取设备种类数量错误")
+		}
+	})
+}
+
+function controlquery2() {
+	var subnet = $("#gateways").val();
+	getModuleInfo2(subnet);
+	getGatmodelCount(subnet);
+}
+
+function getGateWayList() {
+	var url = requestAddr + "/module/selectGateWayList";
+	AjaxPost(url, null, function(result) {
+		if (result != null) {
+			vm.gatewayInfo = result;
+		} else {
+			error("操作发聩", "暂无在网网关");
+		}
+	})
+}
+//根据网关查询设备信息
+function getModuleInfo2(subnet) {
+	var url = requestAddr + "/module/selectModuleBysubnet";
+	var parmData = {
+		'firstPage': $("#pageno").val(),
+		'pageSize': pageSize,
+		'subnet': subnet
+	};
+	AjaxPost(url, parmData, function(result) {
+		if (result.code == 200) {
+			vuee.datas = [];
+			var data = result.data;
+			pageCount = result.msg;
+			$("#divFood").text(pageCount)
+			for (var i = 0; i < data.length; i++) {
+				vuee.datas.push(data[i])
+			}
+			console.log(vuee.datas.length)
+		} else if (result.code == 208) {
+			error("查询操作", result.info)
+		} else if (result != null) {
+			error("查询操作", result.msg)
+		}
+
+	})
+
+}
+
+function changeSelect(num) {
+	switch (num) {
+		case "0":
+			$("#positionSelect").show();
+			$("#NetSelect").hide();
+			controlquery()
+			break;
+		case "1":
+			$("#positionSelect").hide();
+			$("#NetSelect").show();
+			controlquery2()
+			break;
+	}
+}
+
+//批量删除
+function batchDelete(){
+	var result = permisJudge("batchDeleteDevice");
+	if (result) {
+		if ($('#group_wh input[type=checkbox]:checked').length > 0) {
+			$("#remove_modal1").modal("show");
+		} else {
+			notice("操作告警", "请选择要删除的设备记录")
+		}
+	} else {
+		notice("操作权限", "您无此操作权限")
+	}	
+}
+//导出数据
+function batchimport(){
+	var result = permisJudge("batchImport");
+	if (result) {
+		//数据导出
+		if ($('#group_wh input[type=checkbox]:checked').length > 0) {
+			$("#remove_modal1").modal("show");
+		} else {
+			notice("操作告警", "请选择要删除的设备记录")
+		}
+	} else {
+		notice("操作权限", "您无此操作权限")
+	}	
+}
+
+//
+$("#deleteM2Ms").click(function() {
+	var ids = "";
+	if ($("#group_wh .icheckbox_minimal").hasClass('checked')) {
+
+		$("#group_wh .checked").each(function() {
+			var temp = $(this).parent().parent().attr("id");
+			ids += temp + ";"
+		})
+	}
+	if (ids.indexOf(";") > 0) {
+		ids = ids.substring(0, ids.length - 1);
+	}
+	var data = {
+		'ids': ids
+	};
+	var url = requestAddr + "/module/batchDeleteDevices";
+	AjaxPost(url, data, function(result) {
+		if (result.code == 200) {
+			success("删除操作", "所选设备已删除成功");
+			controlquery()
+		} else if (resule.code == 208) {
+			error("删除操作", result.info);
+		} else {
+			error("删除操作", result.msg)
+		}
+	})
+})
+
+
+
+//网关重启
+function restartGateway(gatewayAddr, index){
+	var url = requestAddr + "/gateway/restartGateway";
+	var data = {
+		'gatewayAddr': gatewayAddr
+	};
+	AjaxPost(url, data, function(result) {
+		if (result.code == 200) {
+			vuee.datas[index].status = 5;
+		}else {
+			error("删除操作", result.msg)
+		}
+	})
+	
+}

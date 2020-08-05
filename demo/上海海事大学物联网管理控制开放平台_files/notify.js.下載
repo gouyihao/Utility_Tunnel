@@ -1,0 +1,49 @@
+/*$('#error-notice').click(function() {
+    $.gritter.add({
+      // (string | mandatory) the heading of the notification
+      title: '设备告警',
+      // (string | mandatory) the text inside the notification
+      text: '设备名称：TH1  温度告警 数值45高于阈值30',
+      // (int | optional) the time you want it to be alive for before fading out
+      time: '200000',
+      // (string) specify font-face icon  class for close message
+      close_icon: 'fa fa-window-close',
+      // (string) specify font-face icon class for big icon in left. if are specify image this will not show up.
+      icon: 'fa fa-exclamation-circle',
+      // (string | optional) the class name you want to apply to that specific message
+      class_name: 'error-notice'
+    });
+  });
+
+//info notice
+  $('#info-notice').click(function() {
+    
+  });*/
+/*  $.gritter.add({
+      // (string | mandatory) the heading of the notification
+      title: '设备告警',
+      // (string | mandatory) the text inside the notification
+      text: '设备名称：TH1  温度告警 数值45高于阈值30',
+      // (int | optional) the time you want it to be alive for before fading out
+      time: '6000',
+      // (string) specify font-face icon  class for close message
+      close_icon: 'fa fa-window-close',
+      // (string) specify font-face icon class for big icon in left. if are specify image this will not show up.
+      icon: 'fa fa-exclamation-circle',
+      // (string | optional) the class name you want to apply to that specific message
+      class_name: 'error-notice'
+    });
+  $.gritter.add({
+      // (string | mandatory) the heading of the notification
+      title: '设备恢复正常',
+      // (string | mandatory) the text inside the notification
+      text: '设备名称：TH1  温度恢复正常，当前值：28',
+      // (int | optional) the time you want it to be alive for before fading out
+      time: '3000',
+      // (string) specify font-face icon  class for close message
+      close_icon: 'fa fa-window-close',
+      // (string) specify font-face icon class for big icon in left. if are specify image this will not show up.
+      icon: 'fa fa-info-circle',
+      // (string | optional) the class name you want to apply to that specific message
+      class_name: 'info-notice'
+    });*/   

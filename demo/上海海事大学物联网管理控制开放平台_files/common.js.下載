@@ -1,0 +1,463 @@
+//获取当前登录人角色
+function getRoleByUserName(username) {
+	var url = requestAddr + "/system/getRoleByName";
+	var parmData = {
+		"userName": username
+	};
+	AjaxGet(url, parmData, function(result) {
+		console.log(result)
+		if (result != null) {
+			window.localStorage.setItem('roleName', result);
+		}
+	})
+}
+//获取当前登录人所有权限
+function getPermissionByUser(username) {
+	var url = requestAddr + "/system/getPermissionByUser";
+	var parmData = {
+		"userName": username
+	};
+	AjaxGet(url, parmData, function(result) {
+		if (result != null) {
+			window.localStorage.setItem('permissions', result);
+			// console.log(permissions)
+		}
+	})
+}
+
+/**
+ * 权限判断方法，避免过多的重复代码
+ * @param {Object} permissionName 要判断的权限名称
+ * @return {boolean} 返回是否满足该权限
+ */
+function permisJudge(permissionName) {
+	var permissions = window.localStorage.getItem("permissions");
+	console.log(permissions)
+	if (permissions == null || permissions.length == 0) {
+		return false;
+	}
+	console.log(permissions)
+	permissions = permissions.split(",")
+	var length = permissions.length;
+	var result = false;
+	for (var i = 0; i < length; i++) {
+		if (permissionName == permissions[i]) {
+			result = true;
+			break;
+		}
+	}
+	return result;
+}
+
+/**
+ * @param {Object} url
+ * @param {Object} postData
+ * @param {Object} callBack
+ * Ajax Post异步请求
+ */
+function AjaxPost(url, postData, callBack) {
+	try {
+		var ajaxTimeoutTest = $.ajax({
+			url: url,
+			type: "post",
+			data: postData,
+			timeout: 5000, //超时时间设置，单位毫秒
+			async: true,
+			xhrFields: {
+				withCredentials: true // 要在这里设置 跨域设置cookie
+			},
+			crossDomain: true,
+			success: function(data) {
+				callBack(data);
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				if (textStatus == 'error') { //超时,status还有success,error等值的情况
+					try{
+						warning("请求异常", "请求异常请检查服务器")
+					}catch(e){
+						$("#fail").html("请求异常")
+						$("#fail").next().html("请求异常请检查服务器")
+						$(".prompt-fail").show();
+						setTimeout("$('.prompt-fail').hide()", 1000);
+					}
+					ajaxTimeoutTest.abort();
+				}
+			},
+		});
+	} catch (e) {}
+}
+
+
+/**
+ * @param {Object} url
+ * @param {Object} postData
+ * @param {Object} callBack
+ * Ajax Post异步请求
+ */
+function AjaxPut(url, postData, callBack) {
+	try {
+		var ajaxTimeoutTest = $.ajax({
+			url: url,
+			type: "put",
+			data: postData,
+			timeout: 5000, //超时时间设置，单位毫秒
+			async: true,
+			xhrFields: {
+				withCredentials: true // 要在这里设置 跨域设置cookie
+			},
+			crossDomain: true,
+			success: function(data) {
+				callBack(data);
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				if (textStatus == 'error') { //超时,status还有success,error等值的情况
+					try{
+						warning("请求异常", "请求异常请检查服务器")
+					}catch(e){
+						$("#fail").html("请求异常")
+						$("#fail").next().html("请求异常请检查服务器")
+						$(".prompt-fail").show();
+						setTimeout("$('.prompt-fail').hide()", 1000);
+					}
+					ajaxTimeoutTest.abort();
+				}
+			},
+		});
+	} catch (e) {}
+}
+
+/**
+ * Ajax Get 异步请求
+ * @param {Object} url
+ * @param {Object} callBack
+ * @param {Object} postData
+ */
+function AjaxGet(url, postData, callBack) {
+	try {
+		var ajaxTimeoutTest = $.ajax({
+			url: url,
+			type: "get",
+			data: postData,
+			timeout: 5000, //超时时间设置，单位毫秒
+			async: true,
+			xhrFields: {
+				withCredentials: true // 要在这里设置 跨域设置cookie
+			},
+			crossDomain: true,
+			success: function(data) {
+				callBack(data);
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				if (textStatus == 'error') { //超时,status还有success,error等值的情况
+					try{
+						warning("请求异常", "请求异常请检查服务器")
+					}catch(e){
+						$("#fail").html("请求异常")
+						$("#fail").next().html("请求异常请检查服务器")
+						$(".prompt-fail").show();
+						setTimeout("$('.prompt-fail').hide()", 1000);
+					}
+					ajaxTimeoutTest.abort();
+				}
+			},
+		});
+	} catch (e) {}
+}
+
+/**
+ * Ajax Get 同步请求
+ * @param {Object} url
+ * @param {Object} callBack
+ * @param {Object} postData
+ */
+function ajaxSynchGet(url, postData, callBack) {
+	try {
+		$.ajax({
+			url: url,
+			type: "get",
+			data: postData,
+			timeout: 5000, //超时时间设置，单位毫秒
+			async: false,
+			cache: false,
+			/* xhrFields: {
+				withCredentials: true // 要在这里设置 跨域设置cookie
+			}, */
+			crossDomain: true,
+			success: function(data) {
+				callBack(data);
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				if (textStatus == 'error') { //超时,status还有success,error等值的情况
+					try{
+						warning("请求异常", "请求异常请检查服务器")
+					}catch(e){
+						$("#fail").html("请求异常")
+						$("#fail").next().html("请求异常请检查服务器")
+						$(".prompt-fail").show();
+						setTimeout("$('.prompt-fail').hide()", 1000);
+					}
+					ajaxTimeoutTest.abort();
+				}
+			},
+		});
+	} catch (e) {}
+}
+
+/**
+ * Ajax Post 同步请求
+ * @param {Object} url
+ * @param {Object} postData
+ * @param {Object} callBack
+ */
+function ajaxSynchPost(url, postData, callBack) {
+	try {
+		$.ajax({
+			url: url,
+			type: "post",
+			data: postData,
+			timeout: 5000, //超时时间设置，单位毫秒
+			async: false,
+			/* xhrFields: {
+				withCredentials: true // 要在这里设置 跨域设置cookie
+			}, */
+			crossDomain: true,
+			success: function(data) {
+				callBack(data);
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				if (textStatus == 'error') { //超时,status还有success,error等值的情况
+					try{
+						warning("请求异常", "请求异常请检查服务器")
+					}catch(e){
+						$("#fail").html("请求异常")
+						$("#fail").next().html("请求异常请检查服务器")
+						$(".prompt-fail").show();
+						setTimeout("$('.prompt-fail').hide()", 1000);
+					}
+					ajaxTimeoutTest.abort();
+				}
+			},
+		});
+	} catch (e) {}
+}
+
+/**
+ * Ajax文件上传
+ * @param {Object} url
+ * @param {Object} postData
+ * @param {Object} callBack
+ */
+function ajaxFilePost(url, postData, callBack) {
+	try {
+		$.ajax({
+			url: url,
+			type: "POST",
+			data: postData,
+			timeout: 5000, //超时时间设置，单位毫秒
+			async: true,
+			processData: false,
+			contentType: false,
+			xhrFields: {
+				withCredentials: true // 要在这里设置 跨域设置cookie
+			},
+			crossDomain: true,
+			success: function(data) {
+				callBack(data);
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				if (textStatus == 'error') { //超时,status还有success,error等值的情况
+					try{
+						warning("请求异常", "请求异常请检查服务器")
+					}catch(e){
+						$("#fail").html("请求异常")
+						$("#fail").next().html("请求异常请检查服务器")
+						$(".prompt-fail").show();
+						setTimeout("$('.prompt-fail').hide()", 1000);
+					}
+					ajaxTimeoutTest.abort();
+				}
+			},
+		});
+	} catch (e) {}
+}
+//获取智能传感器
+function getSmartSensor(vuedata) {
+	var url = requestAddr + "/system/getSmartSensorList";
+	AjaxPost(url, null, function(data) {
+		for (var i = 0; i < data.length; i++) {
+			vuedata.push(data[i]);
+		}
+	})
+}
+//
+//获取机电设备
+function getSmartDevice(vuedata) {
+	var url = requestAddr + "/system/getSmartControlList";
+	AjaxPost(url, null, function(data) {
+		for (var i = 0; i < data.length; i++) {
+			vuedata.push(data[i]);
+		}
+	})
+}
+
+//获取所有非故障网关
+function getOnlineGateway(vuedata) {
+	var url = requestAddr + "/module/getOnlineGatewayList";
+	AjaxGet(url, null, function(data) {
+		for (var i = 0; i < data.length; i++) {
+			vuedata.push(data[i]);
+		}
+	})
+}
+//告警框
+function warning(title, info) {
+	$.gritter.add({
+		// (string | mandatory) the heading of the notification
+		title: title,
+		// (string | mandatory) the text inside the notification
+		text: info,
+		// (int | optional) the time you want it to be alive for before fading out
+		time: '5000',
+		// (string) specify font-face icon  class for close message
+		close_icon: 'fa fa-window-close',
+		// (string) specify font-face icon class for big icon in left. if are specify image this will not show up.
+		icon: 'fa fa-exclamation-circle',
+		// (string | optional) the class name you want to apply to that specific message
+		class_name: 'warn-notice'
+	});
+
+}
+//错误提示框
+function error(title, info) {
+	$.gritter.add({
+		// (string | mandatory) the heading of the notification
+		title: title,
+		// (string | mandatory) the text inside the notification
+		text: info,
+		// (int | optional) the time you want it to be alive for before fading out
+		time: '4000',
+		// (string) specify font-face icon  class for close message
+		close_icon: 'fa fa-window-close',
+		// (string) specify font-face icon class for big icon in left. if are specify image this will not show up.
+		icon: 'fa fa-exclamation-circle',
+		// (string | optional) the class name you want to apply to that specific message
+		class_name: 'error-notice'
+	});
+
+}
+//误操作提示框
+function notice(titleInfo, info) {
+
+	$.gritter.add({
+		// (string | mandatory) the heading of the notification
+		title: titleInfo,
+		// (string | mandatory) the text inside the notification
+		text: info,
+		// (int | optional) the time you want it to be alive for before fading out
+		time: '3000',
+		// (string) specify font-face icon  class for close message
+		close_icon: 'fa fa-window-close',
+		// (string) specify font-face icon class for big icon in left. if are specify image this will not show up.
+		icon: 'fa fa-info-circle',
+		// (string | optional) the class name you want to apply to that specific message
+		class_name: 'info-notice'
+	});
+}
+
+/**
+ * 成功提示框
+ * @param {Object} titleInfo
+ * @param {Object} info
+ */
+function success(titleInfo, info) {
+
+	$.gritter.add({
+		// (string | mandatory) the heading of the notification
+		title: titleInfo,
+		// (string | mandatory) the text inside the notification
+		text: info,
+		// (int | optional) the time you want it to be alive for before fading out
+		time: '3000',
+		// (string) specify font-face icon  class for close message
+		close_icon: 'fa fa-window-close',
+		// (string) specify font-face icon class for big icon in left. if are specify image this will not show up.
+		icon: 'fa fa-success-circle',
+		// (string | optional) the class name you want to apply to that specific message
+		class_name: 'success-notice'
+	});
+}
+
+/**
+ * 判断是否为整数
+ * @param val
+ * @returns
+ */
+function isIntNum(val) {
+	var regPos = /^\d+$/; // 非负整数
+	var regNeg = /^\-[1-9][0-9]*$/; // 负整数
+	if (regPos.test(val) || regNeg.test(val)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * 判断是否为非负整数
+ * @param val
+ * @returns
+ */
+function isPosIntNum(val) {
+	var regPos = /^\d+$/; // 非负整数
+	if (regPos.test(val)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * 判断是否为非正整数
+ * @param val
+ * @returns
+ */
+function isNegIntNum(val) {
+	var regNeg = /^\-[1-9][0-9]*$/; // 负整数
+	if (regNeg.test(val)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * 判断为正整数
+ * @param {Object} val
+ */
+function isNegIntNum(val) {
+	var regPos = /^[1-9]\d*$/; // 非负整数
+	if (regPos.test(val)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+/**
+ * 判断为数字
+ * @param {Object} val
+ */
+function isNumber(val) {
+	var regPos = /^\d+(\.\d+)?$/; //非负浮点数
+	var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
+	if (regPos.test(val) || regNeg.test(val)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+//测试cookie
+function testCookie() {
+	return getCookie('customername');
+}

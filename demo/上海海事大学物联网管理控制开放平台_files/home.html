@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)http://www.iotclient.com:8008/Holliot/cgqwh.html -->
+<html style="overflow: hidden;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	
+
+	<meta name="description" content="Violate Responsive Admin Template">
+	<meta name="keywords" content="Super Admin, Admin, Template, Bootstrap">
+
+	<title>Holliot物联网管理控制开放平台</title>
+
+	<!-- CSS -->
+	<link href="./bootstrap.min.css" rel="stylesheet">
+	<link href="./animate.min.css" rel="stylesheet">
+	<link href="./font-awesome.min.css" rel="stylesheet">
+	<link href="./form.css" rel="stylesheet">
+	<link href="./calendar.css" rel="stylesheet">
+	<link href="./style.css" rel="stylesheet">
+	<link href="./icons.css" rel="stylesheet">
+	<link href="./generics.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="./stylereplace.css">
+	<!-- 告警弹窗Css -->
+	<link href="./plugins.css" rel="stylesheet">
+
+	<style type="text/css">
+		.modal .btn {
+			height: 30px;
+		}
+
+		/*#change2{
+			display: none;
+		}*/
+		/* 删除传感器按钮 */
+		.del-btn {
+			width: 70px;
+			height: 24px;
+			border: 1px solid white;
+			border-radius: 5px;
+			float: right;
+			margin-top: 6px;
+			transition: all 0.2s;
+			cursor: pointer;
+			text-align: center;
+		}
+
+		.del-btn:hover {
+			color: #EEB018;
+		}
+
+		.status_style {
+			color: #00FF00;
+		}
+
+		#type_tj div {
+			text-align: center;
+		}
+
+		#type_tj img {
+			margin-top: 14px;
+		}
+
+		#type_tj .sbxq-title {
+			background-image: url(public/img/cgqwh/sbxq-title.png);
+			margin-bottom: 21px;
+			padding-left: 43px;
+			padding-top: 9px;
+			font-size: 18px;
+			background-repeat: no-repeat;
+			font-family: "微软雅黑";
+			text-align: left;
+		}
+
+		.sbxq-title {
+			background-image: url(public/img/cgqwh/sbxq-title.png);
+			margin-bottom: 21px;
+			padding-left: 43px;
+			padding-top: 9px;
+			font-size: 18px;
+			background-repeat: no-repeat;
+			font-family: "微软雅黑";
+			text-align: left;
+		}
+
+		#tb_wh2 th {
+			text-align: center;
+		}
+		#tb_wh {
+			text-align: center;
+		}
+
+		#tb_wh img {
+			margin-left: 5px;
+			margin-right: 5px;
+			cursor: pointer;
+		}
+		#tb_wh img:hover {
+			filter: brightness(130%);
+		}
+		#tb_wh th {
+			text-align: center;
+			height: 40px;
+			font-size: 16px;
+			font-weight: 0;
+		}
+
+		.a-cgqwh {
+			color: #eeb018;
+			margin-left: 5%;
+			margin-right: 5%;
+			cursor: pointer;
+		}
+
+		.content {
+			min-height: calc(100% - 90px);
+		}
+
+		#cgq_list {
+			text-align: left;
+			font-size: 14px;
+		}
+		#change_modal,#change_modal2{
+			overflow: hidden;
+		}
+		#change_modal p {
+			margin-top: 10px;
+			margin-bottom: 5px;
+			font-size: 14px;
+			text-align: left;
+			margin-left: 8px;
+			
+		}
+		#example2{
+			height: 290px;
+			overflow: auto;
+		}
+		.import{
+			left: 111px !important;
+		}
+	</style>
+<style></style><style type="text/css">.jqstooltip { position: absolute;left: 0px;top: 0px;visibility: hidden;background: rgb(0, 0, 0) transparent;background-color: rgba(0,0,0,0.6);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";color: white;font: 10px arial, san serif;text-align: left;white-space: nowrap;padding: 5px;border: 1px solid white;z-index: 10000;}.jqsfield { color: white;font: 10px arial, san serif;text-align: left;}</style></head>
+
+<body id="skin-blur-violate" style="">
+	<div class="content">
+		<h4 class="page-title">
+			<div class="page-titleicon"></div>设备维护
+		</h4>
+		<!-- 位置查询 -->
+		<div class="block-area p-t-0" id="positionSelect">
+			<p class="search-tip">*请选择您要维护的设备所在位置</p>
+			<div id="positiondefined2" class="row"><div class="col-md-2 m-t-5 m-b-15"><select id="1" class="select_search"><option id="1-1" value="海港大道">
+							海港大道
+						</option><option id="2-1" value="五福路">
+							五福路
+						</option></select></div><div class="col-md-2 m-t-5 m-b-15"><select id="2" class="select_search"><option id="3-2" value="第一区">
+							第一区
+						</option><option id="4-2" value="第二区">
+							第二区
+						</option></select></div><div class="col-md-2 m-t-5 m-b-15"><select id="3" class="select_search"><option id="8-3" value="第一单元">
+							第一单元
+						</option><option id="9-3" value="第二单元">
+							第二单元
+						</option></select></div> <div class="col-md-6 "><div onclick="controlquery()" class="search-btn">查询</div> <div onclick="changeSelect(&#39;1&#39;)" class="search-btn big">切换查询条件</div></div></div>
+		</div>
+		<!-- 网关查询 -->
+		<div class="block-area p-t-0" id="NetSelect" style="display: none;">
+			<p class="search-tip">*请选择您要维护的设备所在的网关</p>
+			<div class="row">
+				<div class="col-md-2 col-lg-2 col-sm-6 col-xs-10 m-t-5 m-b-15">
+					<select name="" id="gateways" class="select_search"><option value="192.168.0.17">17号网关</option></select>
+				</div>
+				<div class="col-md-6">
+					<div class="search-btn" onclick="controlquery2()">查询</div>
+					<div class="search-btn big" onclick="changeSelect(&#39;0&#39;)">切换查询条件</div>
+				</div>
+			</div>
+		</div>
+		<div id="type_tj" class="block-area"><div class="sbxq-title">类型统计</div> <div class="col-md-1 col-xs-2" style="visibility: hidden;"><img src="./left_wh.png"></div> <div class="col-md-10 col-xs-8 table-responsive overflow" tabindex="1" style="overflow: hidden; outline: none;"><table id="tb_wh2" class="table table-bordered table-striped list-container"><thead><tr><th>SDN网关控制器</th><th>物联网协调器Ⅰ型</th><th>物联网协调器Ⅱ型</th><th>物联网终端耦合器</th><th>智能网络控制器</th></tr></thead> <tbody id=""><tr><td>1</td><td>0</td><td>1</td><td>2</td><td>1</td></tr></tbody></table></div> <div class="col-md-1 col-xs-2" style="visibility: hidden;"><img src="./right_wh.png"></div></div>
+
+		<div class="block-area" id="devicelist" style="">
+			<div class="sbxq-title">设备详情</div>
+			<div class="row">
+				<!-- 第一行 -->
+				<div class="col-md-12 col-xs-12">
+
+					<div class="btn-del" data-toggle="modal" onclick="batchDelete()">批量删除</div>
+					<div class="btn-del" data-toggle="modal" onclick="batchimport()">导出数据</div>
+				</div>
+				
+				<div class="col-md-12 col-xs-12">
+
+					<!--表格体内容开始-->
+					<div class="table-responsive overflow" tabindex="2" style="overflow: hidden; outline: none;">
+						<table class="table table-bordered table-striped list-container" id="tb_wh">
+							<thead>
+								<tr>
+									<th class="no-sort">
+										<div class="icheckbox_minimal" aria-checked="false" aria-disabled="false" style="position: relative;"><input type="checkbox" class="list-parent-check btn-checkall" id="checkbox-all" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div>
+									</th>
+									<th class="sort">当前状态<div class="canpx"></div></th>
+									<th class="sort">序列码<div class="canpx"></div></th>
+									<th class="no-sort">名称</th>
+									<th class="sort">类型<div class="canpx"></div></th>
+									<th class="no-sort">位置信息</th>
+									<th class="no-sort hidden" style="display: none;">父节点ID</th>
+									<th class="no-sort hidden" style="display: none;">设备ID</th>
+									<th class="no-sort">所带传感器</th>
+									<th class="no-sort">所接机电设备</th>
+									<th class="no-sort">操作</th>
+								</tr>
+							</thead>
+							<tbody id="group_wh"><tr id="273"><td><div class="icheckbox_minimal" aria-checked="false" aria-disabled="false" style="position: relative;"><input type="checkbox" name="" class="list-check" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div></td> <td class="green">运行中</td> <td>192.168.0.17</td> <td>17号网关</td> <td>SDN网关控制器</td> <td>海港大道/第一区/第一单元</td> <td class="hidden" style="display: none;">0</td> <td class="hidden" style="display: none;">1</td> <td><!----> <!----> <!----> <!----></td> <td><!----> <!----></td> <td><!----> <a data-toggle="modal" title="重启网关" style="display: none;"><img src="./restart.png" alt=""></a> <!----> <a data-toggle="modal" title="修改设备信息"><img src="./xg.png" alt="修改"></a> <a id="modulename273" data-toggle="modal" title="删除该设备"><img src="./del.png" alt=""></a></td></tr><tr id="274"><td><div class="icheckbox_minimal" aria-checked="false" aria-disabled="false" style="position: relative;"><input type="checkbox" name="" class="list-check" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div></td> <td class="green">运行中</td> <td>00.00.63.86</td> <td>R6386</td> <td>物联网协调器Ⅱ型</td> <td>海港大道/第一区/第一单元</td> <td class="hidden" style="display: none;">1</td> <td class="hidden" style="display: none;">2</td> <td><!----> <!----> <!----> <!----></td> <td><!----> <!----></td> <td><a title="健康查询" style="display: none;"><img src="./query.png" alt="健康查询"></a> <!----> <a data-toggle="modal" data-target="#modal_mac" title="设备更换" style="display: none;"><img src="./change.png" alt="模块序列号修改"></a> <a data-toggle="modal" title="修改设备信息"><img src="./xg.png" alt="修改"></a> <a id="modulename274" data-toggle="modal" title="删除该设备"><img src="./del.png" alt=""></a></td></tr><tr id="275"><td><div class="icheckbox_minimal" aria-checked="false" aria-disabled="false" style="position: relative;"><input type="checkbox" name="" class="list-check" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div></td> <td class="green">运行中</td> <td>00.00.91.03</td> <td>sc9103</td> <td>智能网络控制器</td> <td>海港大道/第一区/第一单元</td> <td class="hidden" style="display: none;">2</td> <td class="hidden" style="display: none;">3</td> <td><!----> <a data-toggle="modal" data-target="#see_modal" title="无" class="a-cgqwh">查看</a> <!----> <a data-toggle="modal" data-target="#cgq_modal" title="修改设备所接传感器" class="a-cgqwh">
+											修改</a></td> <td><a data-toggle="modal" data-target="#see2_modal" title="绿灯1;绿灯2;风机;报警灯;红灯1;红灯2" class="a-cgqwh">查看</a> <a data-toggle="modal" title="修改外接机电设备" class="a-cgqwh">修改</a></td> <td><a title="健康查询" style="display: none;"><img src="./query.png" alt="健康查询"></a> <!----> <a data-toggle="modal" data-target="#modal_mac" title="设备更换" style="display: none;"><img src="./change.png" alt="模块序列号修改"></a> <a data-toggle="modal" title="修改设备信息"><img src="./xg.png" alt="修改"></a> <a id="modulename275" data-toggle="modal" title="删除该设备"><img src="./del.png" alt=""></a></td></tr><tr id="276"><td><div class="icheckbox_minimal" aria-checked="false" aria-disabled="false" style="position: relative;"><input type="checkbox" name="" class="list-check" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div></td> <td class="green">运行中</td> <td>00.00.5c.03</td> <td>S5C05</td> <td>物联网终端耦合器</td> <td>海港大道/第一区/第一单元</td> <td class="hidden" style="display: none;">2</td> <td class="hidden" style="display: none;">4</td> <td><a data-toggle="modal" data-target="#see_modal" title="可燃气体;温度;湿度;氧气" class="a-cgqwh">查看</a> <!----> <a data-toggle="modal" title="修改设备所接传感器" class="a-cgqwh">
+											修改</a> <!----></td> <td><!----> <!----></td> <td><a title="健康查询" style="display: none;"><img src="./query.png" alt="健康查询"></a> <!----> <a data-toggle="modal" data-target="#modal_mac" title="设备更换" style="display: none;"><img src="./change.png" alt="模块序列号修改"></a> <a data-toggle="modal" title="修改设备信息"><img src="./xg.png" alt="修改"></a> <a id="modulename276" data-toggle="modal" title="删除该设备"><img src="./del.png" alt=""></a></td></tr><tr id="277"><td><div class="icheckbox_minimal" aria-checked="false" aria-disabled="false" style="position: relative;"><input type="checkbox" name="" class="list-check" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div></td> <td class="green">运行中</td> <td>00.00.30.83</td> <td>S3083</td> <td>物联网终端耦合器</td> <td>海港大道/第一区/第一单元</td> <td class="hidden" style="display: none;">2</td> <td class="hidden" style="display: none;">5</td> <td><a data-toggle="modal" data-target="#see_modal" title="烟感" class="a-cgqwh">查看</a> <!----> <a data-toggle="modal" title="修改设备所接传感器" class="a-cgqwh">
+											修改</a> <!----></td> <td><!----> <!----></td> <td><a title="健康查询" style="display: none;"><img src="./query.png" alt="健康查询"></a> <!----> <a data-toggle="modal" data-target="#modal_mac" title="设备更换" style="display: none;"><img src="./change.png" alt="模块序列号修改"></a> <a data-toggle="modal" title="修改设备信息"><img src="./xg.png" alt="修改"></a> <a id="modulename277" data-toggle="modal" title="删除该设备"><img src="./del.png" alt=""></a></td></tr></tbody>
+						</table>
+					</div>
+					<div class="col-md-12 col-xs-12 p-0">
+						<div class="btn-del del-bottom" data-toggle="modal" onclick="batchDelete()">批量删除</div>
+						<div class="btn-del del-bottom import" data-toggle="modal" onclick="batchimport()">导出数据</div>
+						<div class="page-box">
+							<div class=""><a href="javascript:;" onclick="firstPage();">首 页</a></div>
+							<div class=""><a href="javascript:;" onclick="prePage();">上一页</a></div>
+							<div class=""><a href="javascript:;" onclick="nextPage();">下一页</a></div>
+							<div class=""><a href="javascript:;" onclick="lastPage();">末 页</a></div>
+							<div>共<span id="divFood">1</span>页 / 第<input id="pageno" value="1">页</div>
+							<div id="page-btn"><a href="javascript:;" onclick="aimPage();">确定</a></div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+			<!-- 传感器详情 -->
+		</div>
+		<!-- /第二行 -->
+	</div>
+	<footer>
+			<hr class="whiter">
+			<div class="block-area">
+				<div style="clear: both;height: 90px;width: 100%;">
+
+					<p class="text-center footer" style="padding: 10px;">Copyright 2020 SMU ALL Rights Reserved.
+					</p>
+				</div>
+			</div>
+	</footer>
+	<!--弹窗之类的（删除啊，增加啊，修改啊，查看啊~）-->
+	<!-- Change modal 外接设备信息-->
+	<div id="change_modal" class="modal xl fade" role="dialog" style="display: none;">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">×</button>
+					<h5 class="modal-title">修改外接设备</h5>
+				</div>
+
+				<div class="modal-body">
+					<form action="http://www.iotclient.com:8008/Holliot/cgqwh.html" method="post">
+						<div id="example2" class="row" tabindex="5000" style="overflow: hidden; outline: none;"></div>
+
+					</form>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="" data-dismiss="modal" onclick="updateModuleInfo()">保存</button>
+					<button type="button" class="" data-dismiss="modal">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /Change modal -->
+	<!-- Change modal2 设备信息 -->
+	<div id="change_modal2" class="modal md fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">×</button>
+					<h5 class="modal-title">修改设备信息</h5>
+				</div>
+
+				<div class="modal-body">
+					<form method="post">
+						<div>
+							<div class="row m-b-20">
+								<div class="col-sm-2">
+									<span>设备名称</span>
+								</div>
+								<div class="col-sm-3">
+									<input type="text" class="form-control input-sm" id="modelName2" value="">
+								</div>
+							</div>
+							<div id="positiontemp" class="row m-t-20"><div class="col-sm-12 m-b-20"><span>位置信息</span></div> <div class="col-sm-3"><select id="_1" class="select2"><option id="_1-1" value="海港大道">
+											海港大道
+										</option><option id="_2-1" value="五福路">
+											五福路
+										</option></select></div><div class="col-sm-3"><select id="_2" class="select2"><option id="_3-2" value="第一区">
+											第一区
+										</option><option id="_4-2" value="第二区">
+											第二区
+										</option></select></div><div class="col-sm-3"><select id="_3" class="select2"><option id="_8-3" value="第一单元">
+											第一单元
+										</option><option id="_9-3" value="第二单元">
+											第二单元
+										</option></select></div><div class="col-sm-3"><select id="_4" class="select2"><option id="_14-4" value="上十米">
+											上十米
+										</option><option id="_16-4" value="上三十米">
+											上三十米
+										</option><option id="_17-4" value="上六十米">
+											上六十米
+										</option><option id="_19-4" value="上八十米">
+											上八十米
+										</option><option id="_21-4" value="上一百米">
+											上一百米
+										</option></select></div></div>
+						</div>
+					</form>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="" id="saveModuleinfo">保存</button>
+					<button type="button" class="" data-dismiss="modal">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /Change modal2 -->
+
+	<!-- Remove modal -->
+	<div id="remove_modal" class="modal sm fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">×</button>
+					<h5 class="modal-title">重要提示</h5>
+				</div>
+
+				<div class="modal-body">
+					您确定要删除这个设备信息吗？
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="" data-dismiss="modal" id="delete">确定</button>
+					<button type="button" class="" data-dismiss="modal">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="remove_modal1" class="modal sm fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">×</button>
+					<h5 class="modal-title">重要提示</h5>
+				</div>
+	
+				<div class="modal-body">
+					您确定要删除所选设备信息吗？
+				</div>
+	
+				<div class="modal-footer">
+					<button type="button" class="" data-dismiss="modal" id="deleteM2Ms">确定</button>
+					<button type="button" class="" data-dismiss="modal">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /remove modal -->
+	<!-- see modal -->
+	<div id="see_modal" class="modal sm fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">×</button>
+					<h5 class="modal-title">所接传感器</h5>
+				</div>
+	
+				<div class="modal-body">烟感</div>
+	
+				<div class="modal-footer">
+					<button type="button" class="" data-dismiss="modal">确定</button>
+					<button type="button" class="" data-dismiss="modal">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /see modal -->
+	<div id="see2_modal" class="modal sm fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">×</button>
+					<h5 class="modal-title">所接设备</h5>
+				</div>
+	
+				<div class="modal-body">绿灯1;绿灯2;风机;报警灯;红灯1;红灯2</div>
+	
+				<div class="modal-footer">
+					<button type="button" class="" data-dismiss="modal">确定</button>
+					<button type="button" class="" data-dismiss="modal">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /see modal -->
+	<!-- /modal_mac -->
+	<div id="modal_mac" class="modal sm fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">×</button>
+					<h5 class="modal-title">模块序列号更换</h5>
+				</div>
+	
+				<div class="modal-body">
+					<!-- 您确定要删除这个设备信息吗？ -->
+					<label>原序列号：</label><input type="text" class="form-control input-sm m-b-1" id="oldSerialnum">
+					<label>新序列号：</label><input type="text" class="form-control input-sm m-b-1" id="newSerialnum">
+				</div>
+	
+				<div class="modal-footer">
+					<button type="button" class="" data-dismiss="modal" id="moditifyMACAddress">确定</button>
+					<button type="button" class="" data-dismiss="modal">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /modal_mac -->
+	<!-- cgq modal -->
+	<div id="cgq_modal" class="modal l fade" role="dialog">
+		<div class="modal-dialog">
+			<div id="cgq_list" class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" onclick="canceladd()" class="close">×</button> <h5 class="modal-title">修改所接传感器</h5></div> <div class="modal-body"><div class="block-area"><div class="row m-b-20"><div class="col-sm-5"><select name="" class="select2" style="font-size: 16px; padding-left: 4px;"> <option id="addcgq">添加</option></select></div> <div class="col-sm-7"><div class="del-btn">删除</div></div></div> <div class="row"><div class="col-sm-3">
+								传感器名称
+							</div> <div class="col-sm-3"><input type="text" id="sennameundefined" class="form-control input-sm m-b-10"></div> <div class="col-sm-3">
+								传感器类型
+							</div> <div class="col-sm-3"><select id="sensortypeundefined" class="select2"><option value="1/1">温度传感器</option><option value="18/2">湿度传感器</option><option value="4/3">光照强度</option><option value="2/4">人流量传感器</option><option value="3/4">人体红外</option><option value="5/7">氧气传感器</option><option value="6/7">可燃气体传感器</option><option value="9/7">一氧化碳传感器</option><option value="10/7">硫化氢传感器</option><option value="7/9">液位仪</option><option value="8/10">烟雾传感器</option><option value="11/11">电流电压</option><option value="12/12">电流变送器</option><option value="15/13">噪声</option><option value="13/14">PM2.5</option><option value="14/14">PM10</option><option value="16/15">溶解氧</option><option value="17/16">PH值</option></select></div> <div class="col-sm-3 clearfloat">
+								采集周期<span style="font-size: 12px;">(单位:s)</span></div> <div class="col-sm-3"><input type="text" id="dataIntervalundefined" class="form-control input-sm  input-sm m-b-10"></div> <div class="col-sm-3">
+								阈值<span style="font-size: 12px;"></span></div> <div class="col-sm-3"><input type="text" id="threSholdundefined" class="form-control input-sm m-b-5"></div> <div class="col-sm-3 clearfloat">
+								最大值<span style="font-size: 12px;"></span></div> <div class="col-sm-3"><input type="text" id="maximumundefined" class="form-control input-sm m-b-5"></div> <div class="col-sm-3">
+								最小值<span style="font-size: 12px;"></span></div> <div class="col-sm-3"><input type="text" id="minValueundefined" class="form-control input-sm m-b-5"></div></div></div></div> <div class="modal-footer"><button id="btn1undefined" type="button">
+						保存
+					</button> <button type="button" data-dismiss="modal" onclick="canceladd()">取消</button></div></div>
+		</div>
+
+	</div>
+	<!-- /options modal -->
+	<hr class="whiter m-t-10">
+	<div class="block-area" id="foot" style="display:none">
+		<div style="clear: both;height: 160px;width: 100%;">
+
+			<p class="text-center footer" style="padding: 10px;">Copyright 2018 www.holliot.com ALL Rights Reserved.
+				京ICP备00000000号</p>
+		</div>
+	</div>
+
+	<!--
+
+
+	 Javascript Libraries -->
+	<!-- jQuery -->
+	<script src="./jquery.min.js.下載"></script>
+	<!-- jQuery Library -->
+	<script src="./jquery-ui.min.js.下載"></script>
+	<!-- jQuery UI -->
+	<script src="./jquery.easing.1.3.js.下載"></script>
+	<!-- jQuery Easing - Requirred for Lightbox + Pie Charts-->
+
+	<!-- Bootstrap -->
+	<script src="./bootstrap.min.js.下載"></script>
+
+	<!-- Charts -->
+	<script src="./jquery.flot.js.下載"></script>
+	<!-- Flot Main -->
+	<script src="./jquery.flot.time.js.下載"></script>
+	<!-- Flot sub -->
+	<script src="./jquery.flot.animator.min.js.下載"></script>
+	<!-- Flot sub -->
+	<script src="./jquery.flot.resize.min.js.下載"></script>
+	<script src="./jquery.flot.orderBar.js.下載"></script>
+	<!-- Flot Bar chart -->
+	<script src="./jquery.flot.pie.min.js.下載"></script>
+	<!-- Flot Pie chart -->
+
+	<!-- echarts -->
+	<script src="./echarts-all.js.下載"></script>
+
+	<!-- Flot sub - for repaint when resizing the screen -->
+
+	<script src="./sparkline.min.js.下載"></script>
+	<!-- Sparkline - Tiny charts -->
+	<script src="./easypiechart.js.下載"></script>
+	<!-- EasyPieChart - Animated Pie Charts -->
+	<script src="./charts.js.下載"></script>
+	<!-- All the above chart related functions -->
+	
+	<!--  Form Related -->
+	<script src="./validate.min.js.下載"></script>
+	<!-- jQuery Form Validation Library -->
+	<script src="./validationEngine.min.js.下載"></script>
+	<!-- jQuery Form Validation Library - requirred with above js -->
+	<script src="./select.min.js.下載"></script>
+	<!-- Custom Select -->
+	<script src="./chosen.min.js.下載"></script>
+	<!-- Custom Multi Select -->
+	<script src="./datetimepicker.min.js.下載"></script>
+	<!-- Date & Time Picker -->
+	<script src="./colorpicker.min.js.下載"></script>
+	<!-- Color Picker -->
+	<script src="./icheck.js.下載"></script>
+	<!-- Custom Checkbox + Radio -->
+	<script src="./autosize.min.js.下載"></script>
+	<!-- Textare autosize -->
+	<script src="./toggler.min.js.下載"></script>
+	<!-- Toggler -->
+	<script src="./input-mask.min.js.下載"></script>
+	<!-- Input Mask -->
+	<script src="./spinner.min.js.下載"></script>
+	<!-- Spinner -->
+	<script src="./slider.min.js.下載"></script>
+	<!-- Input Slider -->
+	<script src="./fileupload.min.js.下載"></script>
+	<!-- File Upload -->
+
+	<!-- Text Editor -->
+	<script src="./editor2.min.js.下載"></script>
+	<!-- WYSIWYG Editor -->
+	<script src="./markdown.min.js.下載"></script>
+	<!-- Markdown Editor -->
+
+	<!-- UX -->
+	<script src="./scroll.min.js.下載"></script>
+	<!-- Custom Scrollbar -->
+
+	<!-- Other -->
+	<script src="./calendar.min.js.下載"></script>
+	<!-- Calendar -->
+	<script src="./feeds.min.js.下載"></script>
+	<!-- News Feeds -->
+
+	<!-- All JS functions -->
+	<script src="./functions.js.下載"></script>
+
+
+	
+	<!-- <script src="test/ss.js" type="text/javascript" charset="utf-8"></script> -->
+	<script src="./vue.min.js.下載"></script>
+	<!--common function-->
+	<script src="./public.js.下載"></script>
+	<script src="./common.js.下載"></script>
+	<script src="./commonf.js.下載"></script>
+	
+
+	<!--自己用外部JS文件-->
+	<script src="./cgqwh.js.下載"></script>
+	<!--query function-->
+	<script src="./maintaindev.js.下載"></script><div id="ascrail2000" class="nicescroll-rails" style="width: 6px; z-index: 1050; cursor: default; position: absolute; top: 0px; left: -6px; height: 290px; display: none;"><div style="position: relative; top: 0px; float: right; width: 6px; height: 0px; background-color: rgb(173, 220, 229); border: 0px solid rgb(186, 186, 186); background-clip: padding-box; border-radius: 5px;"></div></div><div id="ascrail2000-hr" class="nicescroll-rails" style="height: 6px; z-index: 1050; top: 284px; left: 0px; position: absolute; cursor: default; display: none;"><div style="position: relative; top: 0px; height: 6px; width: 0px; background-color: rgb(173, 220, 229); border: 0px solid rgb(186, 186, 186); background-clip: padding-box; border-radius: 5px;"></div></div>
+	<script src="./jquery.tablesort.min.js.下載"></script>
+	<!-- scroll -->
+	<script src="./iframehelper.js.下載"></script>
+	<script src="./scrollmin.js.下載"></script>
+	<!--信息窗口-->
+	<script src="./jquery.gritter.js.下載"></script>
+	<script src="./notify.js.下載"></script>
+	<!--设备维护webcoskt-->
+	<script src="./websocket.js.下載"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$(function() {
+			 	$('table').tablesort().data('tablesort');
+			 })
+			setTimeout(controlquery, 500)
+			 getGateWayList();
+			 // getDefinePosition(VuePositionTemp.modaltype)
+		})
+		websocket("maintaindev")
+		getDefinePosition3()
+		getDefinePosition2(VuePositionType2.modaltype)
+		getSmartSensor(vue3.sensorList)
+		// getSmartDevice(vue3.sensorList)
+		
+
+		 
+	</script>
+
+
+
+
+
+<div id="ascrail2001" class="nicescroll-rails nicescroll-rails-vr" style="width: 8px; z-index: auto; cursor: default; position: absolute; top: 200.8px; left: 1221.94px; height: 86px; display: none; opacity: 0;"><div class="nicescroll-cursors" style="position: relative; top: 0px; float: right; width: 6px; height: 0px; background-color: rgb(66, 66, 66); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 5px;"></div></div><div id="ascrail2001-hr" class="nicescroll-rails nicescroll-rails-hr" style="height: 8px; z-index: auto; top: 278.8px; left: 129.938px; position: absolute; cursor: default; display: none; opacity: 0;"><div class="nicescroll-cursors" style="position: absolute; top: 0px; height: 6px; width: 0px; background-color: rgb(66, 66, 66); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 5px; left: 0px;"></div></div><div id="ascrail2002" class="nicescroll-rails nicescroll-rails-vr" style="width: 8px; z-index: auto; cursor: default; position: absolute; top: 0px; left: -8px; height: 0px; display: none; opacity: 0;"><div class="nicescroll-cursors" style="position: relative; top: 0px; float: right; width: 6px; height: 0px; background-color: rgb(66, 66, 66); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 5px;"></div></div><div id="ascrail2002-hr" class="nicescroll-rails nicescroll-rails-hr" style="height: 8px; z-index: auto; top: -8px; left: 0px; position: absolute; cursor: default; display: none; opacity: 0;"><div class="nicescroll-cursors" style="position: absolute; top: 0px; height: 6px; width: 0px; background-color: rgb(66, 66, 66); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 5px; left: 0px;"></div></div><div id="ascrail2003" class="nicescroll-rails nicescroll-rails-vr" style="width: 8px; z-index: auto; cursor: default; position: fixed; top: 0px; height: 100%; right: 0px; opacity: 0; display: block;"><div class="nicescroll-cursors" style="position: relative; top: 0px; float: right; width: 6px; height: 614px; background-color: rgb(11, 74, 132); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 5px;"></div></div><div id="ascrail2003-hr" class="nicescroll-rails nicescroll-rails-hr" style="height: 8px; z-index: auto; position: fixed; left: 0px; width: 100%; bottom: 0px; cursor: default; display: none; opacity: 0;"><div class="nicescroll-cursors" style="position: absolute; top: 0px; height: 6px; width: 1371px; background-color: rgb(11, 74, 132); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 5px; left: 0px;"></div></div></body></html>

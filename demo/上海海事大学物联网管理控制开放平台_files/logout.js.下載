@@ -1,0 +1,14 @@
+//退出登录
+function loginOut() {
+
+	var url = requestAddr + "/user/logout";
+	AjaxPost(url, null, function(result) {
+		if (result.code == 200) {
+			window.localStorage.setItem('user', "");
+			window.localStorage.setItem('permissions', "");
+			window.localStorage.setItem('popUp', "");
+			window.parent.document.getElementById("role").innerHTML = ""
+			parent.location.href = "login.html"
+		}
+	})
+}
